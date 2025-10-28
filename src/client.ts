@@ -5,6 +5,7 @@ import { CalendarResource } from "./resources/calendar";
 import { FortniteAPIError } from "./errors";
 import { BundlesResource } from "./resources/bundles";
 import { OauthResource } from "./resources/oauth";
+import { ParsingResource } from "./resources/parsing";
 
 export interface ClientOptions {
   apiKey: string;
