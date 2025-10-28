@@ -5,7 +5,7 @@ JavaScript/TypeScript SDK for the Fortnite API by Royal Arena.
 ## Installation
 
 ```bash
-npm install @yaelou/fortnite-api
+npm install @yaelouuu/fortnite-api
 ```
 
 ## Quick Start
@@ -44,4 +44,5 @@ const season = await client.calendar.getCurrentSeason();
 
 ## Documentation
 
-Full API documentation: https://api.api-fortnite.com/documentation
+Full API documentation (swagger): https://documentation.api-fortnite.com/documentation
+SDK documentation: https://api-fortnite.com/sdk-doc
