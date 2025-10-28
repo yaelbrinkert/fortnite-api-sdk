@@ -3,4 +3,6 @@ test/
 /test
 *manual-test.ts
 node_modules
-/distdist/
+/dist
+dist/
+package-lock.json
