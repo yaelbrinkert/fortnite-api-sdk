@@ -45,4 +45,4 @@ const season = await client.calendar.getCurrentSeason();
 ## Documentation
 
 Full API documentation (swagger): https://documentation.api-fortnite.com/documentation
-SDK documentation: https://api-fortnite.com/sdk-doc
+SDK documentation: https://sdk.api-fortnite.com/
