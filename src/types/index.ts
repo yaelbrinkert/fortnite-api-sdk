@@ -111,3 +111,21 @@ export interface OAuthDeviceRefreshResponse {
   accountId: string;
   displayName: string;
 }
+
+// Parsing Types
+export interface ParsedReplayData {
+  // Replays cannot be predicted
+  [key: string]: any;
+}
+
+export interface ParsingResponse {
+  success: boolean;
+  data?: ParsedReplayData;
+  error?: string;
+}
+
+export interface BatchParsingResponse {
+  success: boolean;
+  results?: ParsedReplayData[];
+  error?: string;
+}

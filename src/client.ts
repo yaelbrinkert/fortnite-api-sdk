@@ -22,6 +22,7 @@ export class FortniteAPI {
   public calendar: CalendarResource;
   public bundles: BundlesResource;
   public oauth: OauthResource;
+  public parsing: ParsingResource;
 
   constructor(options: ClientOptions) {
     this.apiKey = options.apiKey;
@@ -35,6 +36,7 @@ export class FortniteAPI {
     this.calendar = new CalendarResource(this);
     this.bundles = new BundlesResource(this);
     this.oauth = new OauthResource(this);
+    this.parsing = new ParsingResource(this);
   }
 
   /**
@@ -50,6 +52,40 @@ export class FortniteAPI {
         "Content-Type": "application/json",
         ...options.headers,
       },
+    });
+
+    if (!response.ok) {
+      let errorData: any;
+      try {
+        errorData = await response.json();
+      } catch {
+        errorData = { error: "Request failed" };
+      }
+
+      throw new FortniteAPIError(
+        errorData.error || `Request failed with status ${response.status}`,
+        response.status,
+        errorData
+      );
+    }
+
+    const data = await response.json();
+    return data as T;
+  }
+
+  /**
+   * Internal method for multipart/form-data requests (file uploads)
+   */
+  async requestMultipart<T>(endpoint: string, formData: FormData): Promise<T> {
+    const url = `${this.baseUrl}${endpoint}`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "x-api-key": this.apiKey,
+        // Don't set Content-Type - browser/node will set it with boundary
+      },
+      body: formData,
     });
 
     if (!response.ok) {
