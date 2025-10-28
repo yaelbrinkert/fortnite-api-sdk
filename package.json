@@ -1,0 +1,27 @@
+{
+  "name": "@yaelouuu/fortnite-api",
+  "version": "1.0.0",
+  "description": "SDK for Fortnite Tournaments API by Royal Arena - Author : yaelouuu",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "fortnite",
+    "api",
+    "tournaments",
+    "sdk"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ]
+}
