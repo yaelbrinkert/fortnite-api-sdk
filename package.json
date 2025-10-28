@@ -1,6 +1,6 @@
 {
   "name": "@yaelouuu/fortnite-api",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "SDK for Fortnite Tournaments API by Royal Arena - Author : yaelouuu",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
