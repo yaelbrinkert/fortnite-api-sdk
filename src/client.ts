@@ -4,6 +4,7 @@ import { ProfilesResource } from "./resources/profiles";
 import { CalendarResource } from "./resources/calendar";
 import { FortniteAPIError } from "./errors";
 import { BundlesResource } from "./resources/bundles";
+import { OauthResource } from "./resources/oauth";
 
 export interface ClientOptions {
   apiKey: string;
@@ -20,6 +21,7 @@ export class FortniteAPI {
   public profiles: ProfilesResource;
   public calendar: CalendarResource;
   public bundles: BundlesResource;
+  public oauth: OauthResource;
 
   constructor(options: ClientOptions) {
     this.apiKey = options.apiKey;
@@ -32,6 +34,7 @@ export class FortniteAPI {
     this.profiles = new ProfilesResource(this);
     this.calendar = new CalendarResource(this);
     this.bundles = new BundlesResource(this);
+    this.oauth = new OauthResource(this);
   }
 
   /**

@@ -72,3 +72,42 @@ export interface SeasonInfo {
 }
 
 // Oauth types
+// Response types
+export interface OAuthFlowResponse {
+  success: boolean;
+  flowId: string;
+  verificationUri: string;
+  expiresIn: number;
+}
+
+export interface OAuthCompleteResponse {
+  success: boolean;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  accountId: string;
+  displayName: string;
+  deviceAuth: {
+    accountId: string;
+    deviceId: string;
+    secret: string;
+  };
+}
+
+export interface OAuthRefreshResponse {
+  success: boolean;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  accountId: string;
+  tokenChanged: boolean;
+}
+
+export interface OAuthDeviceRefreshResponse {
+  success: boolean;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  accountId: string;
+  displayName: string;
+}
