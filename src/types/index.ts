@@ -129,3 +129,29 @@ export interface BatchParsingResponse {
   results?: ParsedReplayData[];
   error?: string;
 }
+
+// Tournament Tracker types
+export interface TournamentTrackerEntry {
+  eventWindowId: string;
+  eventName: string;
+  eventId: string;
+  beginTime: string;
+  endTime: string;
+  region: string;
+}
+
+export interface TournamentTrackerResponse {
+  tournaments_played: TournamentTrackerEntry[];
+  total_count: number;
+}
+
+export interface TournamentEligibilityResponse {
+  eligible: boolean;
+  tournaments_played: number;
+  tournaments_required: number;
+  tournaments_remaining: number;
+  calculation_period_days: number;
+  oldest_tournament_date: string | null;
+  newest_tournament_date: string | null;
+  recent_tournaments: TournamentTrackerEntry[];
+}
