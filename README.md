@@ -8,6 +8,10 @@ JavaScript/TypeScript SDK for the Fortnite API by Royal Arena.
 npm install @yaelouuu/fortnite-api
 ```
 
+## API Key
+
+Acquire your API Key by creating a Free Account here : https://api-fortnite.com
+
 ## Quick Start
 
 ```typescript
