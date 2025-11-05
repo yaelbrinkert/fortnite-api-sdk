@@ -11,54 +11,114 @@ export class TournamentsResource {
 
   /**
    * Get current events
+   * No parameters needed - uses API's default account
    */
-  async getCurrent(params?: { accountId?: string }): Promise<any> {
-    const queryString = params?.accountId
-      ? `?accountId=${params.accountId}`
-      : "";
-    return this.client.request(`/events/data/current${queryString}`);
+  async getCurrent(): Promise<any> {
+    return this.client.request("/events/data/current");
   }
 
   /**
    * Get past events
+   * No parameters needed - uses API's default account
    */
-  async getPast(params?: { accountId?: string }): Promise<any> {
-    const queryString = params?.accountId
-      ? `?accountId=${params.accountId}`
-      : "";
-    return this.client.request(`/events/data/past${queryString}`);
+  async getPast(): Promise<any> {
+    return this.client.request("/events/data/past");
   }
 
   /**
-   * Get global events
+   * Get global events with metadata
    */
   async getGlobal(): Promise<any> {
     return this.client.request("/events/global");
   }
 
   /**
-   * Get tournament leaderboard
+   * Download events for a specific account
+   * Requires user's own Fortnite token
+   * @param params.accountId - Epic Games Account ID
+   * @param params.region - Region (EU, NAE, NAW, etc.)
+   * @param params.platform - Platform (Windows, PlayStation, etc.)
+   * @param fortniteToken - User's Fortnite access token (from OAuth flow)
    */
-  async getLeaderboard(params: {
-    eventId: string;
-    eventWindowId: string;
-    page?: number;
-    leaderboardDef?: string;
-  }): Promise<Leaderboard> {
-    const { eventId, eventWindowId, page = 0, leaderboardDef } = params;
+  async download(
+    params: {
+      accountId: string;
+      region: string;
+      platform: string;
+    },
+    fortniteToken: string
+  ): Promise<any> {
+    const query = new URLSearchParams({
+      accountId: params.accountId,
+      region: params.region,
+      platform: params.platform,
+    }).toString();
+
+    return this.client.request(`/events/download?${query}`, {
+      headers: {
+        "x-fortnite-token": fortniteToken,
+      },
+    });
+  }
+
+  /**
+   * Get tournament leaderboard
+   * @param params.eventId - Event ID
+   * @param params.eventWindowId - Event window ID
+   * @param params.page - Page number (default: 0)
+   * @param params.leaderboardDef - Optional leaderboard definition
+   * @param params.accountId - Optional account ID to highlight
+   * @param fortniteToken - Optional user's Fortnite token for personalized view
+   */
+  async getLeaderboard(
+    params: {
+      eventId: string;
+      eventWindowId: string;
+      page?: number;
+      leaderboardDef?: string;
+      accountId?: string;
+    },
+    fortniteToken?: string
+  ): Promise<Leaderboard> {
+    const {
+      eventId,
+      eventWindowId,
+      page = 0,
+      leaderboardDef,
+      accountId,
+    } = params;
+
     const query = new URLSearchParams({
       eventId,
       eventWindowId,
       page: page.toString(),
-      ...(leaderboardDef && { leaderboardDef }),
-    }).toString();
+    });
 
-    return this.client.request<Leaderboard>(`/events/leaderboard?${query}`);
+    if (leaderboardDef) {
+      query.append("leaderboardDef", leaderboardDef);
+    }
+
+    if (accountId) {
+      query.append("accountId", accountId);
+    }
+
+    const options = fortniteToken
+      ? {
+          headers: {
+            "x-fortnite-token": fortniteToken,
+          },
+        }
+      : undefined;
+
+    return this.client.request<Leaderboard>(
+      `/events/leaderboard?${query.toString()}`,
+      options
+    );
   }
 
   /**
    * Get tournament participation history for a player
-   * GET /tournament-tracker
+   * Requires user's own Fortnite token
    * @param accountId - Epic Games Account ID
    * @param fortniteToken - User's Fortnite access token (from OAuth flow)
    */
@@ -78,17 +138,19 @@ export class TournamentsResource {
 
   /**
    * Check if a player is eligible for major tournaments
-   * GET /tournament-eligibility
+   * Requires user's own Fortnite token
    * @param accountId - Epic Games Account ID
    * @param fortniteToken - User's Fortnite access token (from OAuth flow)
    * @param options - Optional configuration for eligibility check
+   * @param options.days - Number of days to check (default: 180, max: 365)
+   * @param options.requiredTournaments - Required tournaments for eligibility (default: 14, max: 50)
    */
   async checkEligibility(
     accountId: string,
     fortniteToken: string,
     options?: {
-      days?: number; // Default: 180
-      requiredTournaments?: number; // Default: 14
+      days?: number;
+      requiredTournaments?: number;
     }
   ): Promise<TournamentEligibilityResponse> {
     const params = new URLSearchParams({ accountId });
