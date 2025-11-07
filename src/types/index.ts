@@ -1,14 +1,72 @@
 // Shop types
 export interface Shop {
-  date: string;
-  bundles: ShopBundle[];
+  refreshIntervalHrs: number;
+  dailyPurchaseHrs: number;
+  expiration: string;
+  storefronts: Storefront[];
 }
 
-export interface ShopBundle {
-  id: string;
+export interface Storefront {
   name: string;
-  price: number;
-  items: ShopItem[];
+  catalogEntries: CatalogEntry[];
+}
+
+export interface CatalogEntry {
+  offerId: string;
+  devName: string;
+  offerType: string;
+  prices: Price[];
+  categories: string[];
+  dailyLimit: number;
+  weeklyLimit: number;
+  monthlyLimit: number;
+  refundable: boolean;
+  appStoreId: string[];
+  requirements: Requirement[];
+  metaInfo: MetaInfo[];
+  catalogGroup: string;
+  catalogGroupPriority: number;
+  sortPriority: number;
+  title: string;
+  shortDescription: string;
+  description: string;
+  displayAssetPath: string;
+  itemGrants: ItemGrant[];
+  giftInfo?: GiftInfo;
+}
+
+export interface Price {
+  currencyType: string;
+  currencySubType: string;
+  regularPrice: number;
+  dynamicRegularPrice: number;
+  finalPrice: number;
+  saleExpiration: string;
+  basePrice: number;
+  saleType?: string;
+}
+
+export interface Requirement {
+  requirementType: string;
+  requiredId: string;
+  minQuantity: number;
+}
+
+export interface MetaInfo {
+  key: string;
+  value: string;
+}
+
+export interface ItemGrant {
+  templateId: string;
+  quantity: number;
+  attributes: Record<string, any>;
+}
+
+export interface GiftInfo {
+  bIsEnabled: boolean;
+  forcedGiftBoxTemplateId: string;
+  purchaseRequirements: any[];
 }
 
 export interface TournamentsBundle {}
