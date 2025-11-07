@@ -1,5 +1,5 @@
 import { FortniteAPI } from "../client";
-import { TournamentsBundle, ShopBundle } from "../types";
+import { TournamentsBundle, Shop } from "../types";
 
 export class BundlesResource {
   constructor(private client: FortniteAPI) {}
@@ -16,7 +16,7 @@ export class BundlesResource {
   /**
    * Get current season information
    */
-  async getBundlesShop(): Promise<ShopBundle> {
-    return this.client.request<ShopBundle>("/assets/bundles/shop");
+  async getBundlesShop(): Promise<Shop> {
+    return this.client.request<Shop>("/assets/bundles/shop");
   }
 }
