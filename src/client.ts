@@ -6,6 +6,7 @@ import { FortniteAPIError } from "./errors";
 import { BundlesResource } from "./resources/bundles";
 import { OauthResource } from "./resources/oauth";
 import { ParsingResource } from "./resources/parsing";
+import { WeaponsResource } from "./resources/weapons";
 
 export interface ClientOptions {
   apiKey: string;
@@ -24,6 +25,7 @@ export class FortniteAPI {
   public bundles: BundlesResource;
   public oauth: OauthResource;
   public parsing: ParsingResource;
+  public weapons: WeaponsResource;
 
   constructor(options: ClientOptions) {
     this.apiKey = options.apiKey;
@@ -38,6 +40,7 @@ export class FortniteAPI {
     this.bundles = new BundlesResource(this);
     this.oauth = new OauthResource(this);
     this.parsing = new ParsingResource(this);
+    this.weapons = new WeaponsResource(this);
   }
 
   /**

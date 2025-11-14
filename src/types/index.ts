@@ -213,3 +213,45 @@ export interface TournamentEligibilityResponse {
   newest_tournament_date: string | null;
   recent_tournaments: TournamentTrackerEntry[];
 }
+
+// Weapons
+export interface Weapons {
+  key: WeaponsInfos;
+}
+
+export interface WeaponsInfos {
+  id: string;
+  displayName: string;
+  description: string;
+  rarity: string;
+  gameplayTags: GameplayTags;
+  icon: string;
+  type: string;
+  category: string | null;
+  season: number;
+  series: string;
+  stats: WeaponsStats;
+}
+
+export interface GameplayTags {
+  gameplayTags: Array<String>;
+}
+
+export interface WeaponsStats {
+  firingRate: number;
+  dynamicFiringRate: number;
+  burstFiringRate: number;
+  criticalDamageMultiplier: number;
+  vulnerabilityDamageMultiplier: number;
+  diceCritChance: number;
+  diceCritDamageMultiplier: number;
+  reloadTime: number;
+  damagePerBullet: number;
+  environmentDamagePerBullet: number;
+  clipSize: number;
+  ammoCostPerFire: number;
+  bulletsPerCartridge: number;
+  cartridgePerFire: number;
+  overheatedCooldownDelay: number;
+  maxDamagePerCartridge: number;
+}
