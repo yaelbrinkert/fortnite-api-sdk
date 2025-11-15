@@ -255,3 +255,82 @@ export interface WeaponsStats {
   overheatedCooldownDelay: number;
   maxDamagePerCartridge: number;
 }
+
+export interface BattlePass {
+  battlePassContent: BattlePassContent;
+  battlePassOffers: Array<BattlePassOffers>;
+}
+
+export interface MessagesBP {
+  layout: string;
+  image: string;
+  hidden?: boolean;
+  _type: string;
+  title: string;
+  body: string;
+  spotlight: boolean;
+}
+
+export interface BattlePassContent {
+  news: {
+    _type: string;
+    messages: Array<MessagesBP>;
+  };
+  _title: string;
+  _noIndex: boolean;
+  _activeDate: string;
+  lastModified: string;
+  _locale: string;
+  _templateName: string;
+  _suggestedPrefetch: Array<any>;
+}
+
+export interface PricesBP {
+  currencyType: string;
+  currencySubType: string;
+  regularPrice: number;
+  dynamicRegularPrice: number;
+  finalPrice: number;
+  saleExpiration: string;
+  basePrice: number;
+}
+
+export interface RequirementsBP {
+  requirementType: string;
+  requiredId: string;
+  minQuantity: number;
+}
+
+export interface MetaInfoBP {
+  key: string;
+  value: string;
+}
+
+export interface BattlePassOffers {
+  offerId: string;
+  devName: string;
+  offerType: string;
+  prices: Array<PricesBP>;
+  categories: Array<any>;
+  dailyLimit: number;
+  weeklyLimit: number;
+  monthlyLimit: number;
+  refundable: boolean;
+  appStoreId: Array<string>;
+  requirements: Array<RequirementsBP>;
+  metaInfo: Array<MetaInfoBP>;
+  catalogGroup: string;
+  catalogGroupPriority: number;
+  sortPriority: number;
+  title: string;
+  shortDescription: string;
+  description: string;
+  displayAssetPath: string;
+  itemGrants: Array<any>;
+  sectionId: string | null;
+  sectionDisplayName: string | null;
+  sectionPriority: number | null;
+  sectionBackground: null | null;
+  offerVisual: string | null;
+  tileSize: string;
+}

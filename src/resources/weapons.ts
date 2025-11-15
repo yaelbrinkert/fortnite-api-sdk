@@ -8,6 +8,6 @@ export class WeaponsResource {
    * Get weapons and infos
    */
   async getWeapons(): Promise<Weapons> {
-    return this.client.request<Weapons>("/weapons");
+    return this.client.request<Weapons>("/weapons", {}, "v2");
   }
 }

@@ -7,6 +7,7 @@ import { BundlesResource } from "./resources/bundles";
 import { OauthResource } from "./resources/oauth";
 import { ParsingResource } from "./resources/parsing";
 import { WeaponsResource } from "./resources/weapons";
+import { BattlePassResource } from "./resources/battlepass";
 
 export interface ClientOptions {
   apiKey: string;
@@ -26,10 +27,11 @@ export class FortniteAPI {
   public oauth: OauthResource;
   public parsing: ParsingResource;
   public weapons: WeaponsResource;
+  public batttlepass: BattlePassResource;
 
   constructor(options: ClientOptions) {
     this.apiKey = options.apiKey;
-    this.baseUrl = options.baseUrl || "https://prod.api-fortnite.com/api/v1";
+    this.baseUrl = options.baseUrl || "https://prod.api-fortnite.com/api";
     // this.baseUrl = options.baseUrl || "http://localhost:4321/api/v1";
 
     // Initialize resources
@@ -41,13 +43,18 @@ export class FortniteAPI {
     this.oauth = new OauthResource(this);
     this.parsing = new ParsingResource(this);
     this.weapons = new WeaponsResource(this);
+    this.batttlepass = new BattlePassResource(this);
   }
 
   /**
    * Internal method to make HTTP requests
    */
-  async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
+  async request<T>(
+    endpoint: string,
+    options: RequestInit = {},
+    version: "v1" | "v2" | "v3" = "v1"
+  ): Promise<T> {
+    const url = `${this.baseUrl}/${version}${endpoint}`;
 
     const response = await fetch(url, {
       ...options,
@@ -80,8 +87,12 @@ export class FortniteAPI {
   /**
    * Internal method for multipart/form-data requests (file uploads)
    */
-  async requestMultipart<T>(endpoint: string, formData: FormData): Promise<T> {
-    const url = `${this.baseUrl}${endpoint}`;
+  async requestMultipart<T>(
+    endpoint: string,
+    formData: FormData,
+    version: "v1" | "v2" | "v3" = "v1"
+  ): Promise<T> {
+    const url = `${this.baseUrl}/${version}${endpoint}`;
 
     const response = await fetch(url, {
       method: "POST",
