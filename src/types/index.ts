@@ -334,3 +334,10 @@ export interface BattlePassOffers {
   offerVisual: string | null;
   tileSize: string;
 }
+
+// Quests types
+export interface QuestsResponse {
+  // The quests API returns dynamic data from Epic Games
+  // Structure may vary based on season and available quests
+  [key: string]: any;
+}

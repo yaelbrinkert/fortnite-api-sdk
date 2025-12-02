@@ -175,4 +175,48 @@ export class TournamentsResource {
       }
     );
   }
+
+  /**
+   * Get tournament leaderboard using V2 endpoint (POST with teams body)
+   * @param params.eventId - Event ID
+   * @param params.eventWindowId - Event window ID
+   * @param params.leaderboardDef - Optional leaderboard definition (required for Ranked Cups)
+   * @param teams - Array of team member account ID arrays (e.g., [["accountId1"], ["accountId2"]])
+   * @param fortniteToken - Optional user's Fortnite token for personalized view
+   */
+  async getLeaderboardV2(
+    params: {
+      eventId: string;
+      eventWindowId: string;
+      leaderboardDef?: string;
+    },
+    teams: string[][],
+    fortniteToken?: string
+  ): Promise<Leaderboard> {
+    const query = new URLSearchParams({
+      eventId: params.eventId,
+      eventWindowId: params.eventWindowId,
+    });
+
+    if (params.leaderboardDef) {
+      query.append("leaderboardDef", params.leaderboardDef);
+    }
+
+    const options: RequestInit = {
+      method: "POST",
+      body: JSON.stringify({ teams }),
+    };
+
+    if (fortniteToken) {
+      options.headers = {
+        "x-fortnite-token": fortniteToken,
+      };
+    }
+
+    return this.client.request<Leaderboard>(
+      `/events/leaderboard?${query.toString()}`,
+      options,
+      "v2"
+    );
+  }
 }

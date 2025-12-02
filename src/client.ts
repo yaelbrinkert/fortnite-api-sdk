@@ -8,6 +8,7 @@ import { OauthResource } from "./resources/oauth";
 import { ParsingResource } from "./resources/parsing";
 import { WeaponsResource } from "./resources/weapons";
 import { BattlePassResource } from "./resources/battlepass";
+import { QuestsResource } from "./resources/quests";
 
 export interface ClientOptions {
   apiKey: string;
@@ -27,7 +28,8 @@ export class FortniteAPI {
   public oauth: OauthResource;
   public parsing: ParsingResource;
   public weapons: WeaponsResource;
-  public batttlepass: BattlePassResource;
+  public battlepass: BattlePassResource;
+  public quests: QuestsResource;
 
   constructor(options: ClientOptions) {
     this.apiKey = options.apiKey;
@@ -43,7 +45,8 @@ export class FortniteAPI {
     this.oauth = new OauthResource(this);
     this.parsing = new ParsingResource(this);
     this.weapons = new WeaponsResource(this);
-    this.batttlepass = new BattlePassResource(this);
+    this.battlepass = new BattlePassResource(this);
+    this.quests = new QuestsResource(this);
   }
 
   /**
