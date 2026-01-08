@@ -9,6 +9,16 @@ import { ParsingResource } from "./resources/parsing";
 import { WeaponsResource } from "./resources/weapons";
 import { BattlePassResource } from "./resources/battlepass";
 import { QuestsResource } from "./resources/quests";
+import { AccountResource } from "./resources/account";
+import { FNResource } from "./resources/fn";
+import { FriendsResource } from "./resources/friends";
+import { StatsResource } from "./resources/stats";
+import { EventsResource } from "./resources/events";
+import { NewsResource } from "./resources/news";
+import { CosmeticsResource } from "./resources/cosmetics";
+import { CrewResource } from "./resources/crew";
+import { MapResource } from "./resources/map";
+import { PlaylistsResource } from "./resources/playlists";
 
 export interface ClientOptions {
   apiKey: string;
@@ -30,6 +40,16 @@ export class FortniteAPI {
   public weapons: WeaponsResource;
   public battlepass: BattlePassResource;
   public quests: QuestsResource;
+  public account: AccountResource;
+  public fn: FNResource;
+  public friends: FriendsResource;
+  public stats: StatsResource;
+  public events: EventsResource;
+  public news: NewsResource;
+  public cosmetics: CosmeticsResource;
+  public crew: CrewResource;
+  public map: MapResource;
+  public playlists: PlaylistsResource;
 
   constructor(options: ClientOptions) {
     this.apiKey = options.apiKey;
@@ -47,6 +67,16 @@ export class FortniteAPI {
     this.weapons = new WeaponsResource(this);
     this.battlepass = new BattlePassResource(this);
     this.quests = new QuestsResource(this);
+    this.account = new AccountResource(this);
+    this.fn = new FNResource(this);
+    this.friends = new FriendsResource(this);
+    this.stats = new StatsResource(this);
+    this.events = new EventsResource(this);
+    this.news = new NewsResource(this);
+    this.cosmetics = new CosmeticsResource(this);
+    this.crew = new CrewResource(this);
+    this.map = new MapResource(this);
+    this.playlists = new PlaylistsResource(this);
   }
 
   /**

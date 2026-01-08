@@ -178,11 +178,73 @@ export class TournamentsResource {
 
   /**
    * Get tournament leaderboard using V2 endpoint (POST with teams body)
-   * @param params.eventId - Event ID
-   * @param params.eventWindowId - Event window ID
-   * @param params.leaderboardDef - Optional leaderboard definition (required for Ranked Cups)
-   * @param teams - Array of team member account ID arrays (e.g., [["accountId1"], ["accountId2"]])
-   * @param fortniteToken - Optional user's Fortnite token for personalized view
+   *
+   * This is an enhanced version of the leaderboard endpoint that accepts a POST request
+   * with a teams array in the body. Use this endpoint when you need to query leaderboard
+   * data for multiple teams at once or for Ranked Cups that require specific team lookups.
+   *
+   * **Differences from V1**:
+   * - Uses POST method instead of GET
+   * - Accepts teams array in request body
+   * - Better suited for bulk team queries
+   * - Required for certain Ranked Cup leaderboards
+   *
+   * **Authentication**: Optional. Include fortniteToken for personalized leaderboard views
+   *
+   * **API Version**: v2
+   *
+   * **Rate Limit**: Standard API rate limits apply
+   *
+   * @param params - Leaderboard query parameters
+   * @param params.eventId - Event ID (e.g., "epicgames_S37_BlitzCupsAllPlatforms_BR")
+   * @param params.eventWindowId - Event window ID (e.g., "S37_BlitzCupsAllPlatforms_Event1_BR")
+   * @param params.leaderboardDef - Optional leaderboard definition ID (required for Ranked Cups with multiple leaderboards)
+   * @param teams - Array of team member account ID arrays. Each team is an array of account IDs.
+   *                For solo events: [["accountId1"], ["accountId2"]]
+   *                For duo events: [["player1Id", "player2Id"], ["player3Id", "player4Id"]]
+   * @param fortniteToken - Optional user's Fortnite access token for personalized leaderboard view
+   *
+   * @returns Promise resolving to leaderboard data with entries, ranks, and stats
+   *
+   * @throws {FortniteAPIError} When the request fails (invalid event, missing leaderboardDef, etc.)
+   *
+   * @example
+   * ```typescript
+   * // Get leaderboard for multiple solo players
+   * const leaderboard = await client.tournaments.getLeaderboardV2(
+   *   {
+   *     eventId: "epicgames_S37_BlitzCupsAllPlatforms_BR",
+   *     eventWindowId: "S37_BlitzCupsAllPlatforms_Event1_BR"
+   *   },
+   *   [
+   *     ["accountId1"],
+   *     ["accountId2"],
+   *     ["accountId3"]
+   *   ]
+   * );
+   *
+   * // For duo tournament
+   * const duoLeaderboard = await client.tournaments.getLeaderboardV2(
+   *   {
+   *     eventId: "epicgames_S37_DuoCup_BR",
+   *     eventWindowId: "S37_DuoCup_Event1_BR"
+   *   },
+   *   [
+   *     ["player1Id", "player2Id"],
+   *     ["player3Id", "player4Id"]
+   *   ]
+   * );
+   *
+   * // For Ranked Cup with leaderboardDef
+   * const rankedLeaderboard = await client.tournaments.getLeaderboardV2(
+   *   {
+   *     eventId: "epicgames_S37_RankedCup_BR",
+   *     eventWindowId: "S37_RankedCup_Event1_BR",
+   *     leaderboardDef: "ranked_br_division_7"
+   *   },
+   *   [["accountId1"], ["accountId2"]]
+   * );
+   * ```
    */
   async getLeaderboardV2(
     params: {
