@@ -32,6 +32,11 @@ export class TournamentsResource {
     return this.client.request("/events/global");
   }
 
+  async getSessions(params: { eventId: string }): Promise<any> {
+    const { eventId } = params;
+    return this.client.request(`/events/sessions?eventId=${eventId}`);
+  }
+
   /**
    * Download events for a specific account
    * Requires user's own Fortnite token
@@ -46,7 +51,7 @@ export class TournamentsResource {
       region: string;
       platform: string;
     },
-    fortniteToken: string
+    fortniteToken: string,
   ): Promise<any> {
     const query = new URLSearchParams({
       accountId: params.accountId,
@@ -78,7 +83,7 @@ export class TournamentsResource {
       leaderboardDef?: string;
       accountId?: string;
     },
-    fortniteToken?: string
+    fortniteToken?: string,
   ): Promise<Leaderboard> {
     const {
       eventId,
@@ -112,7 +117,7 @@ export class TournamentsResource {
 
     return this.client.request<Leaderboard>(
       `/events/leaderboard?${query.toString()}`,
-      options
+      options,
     );
   }
 
@@ -124,7 +129,7 @@ export class TournamentsResource {
    */
   async getTracker(
     accountId: string,
-    fortniteToken: string
+    fortniteToken: string,
   ): Promise<TournamentTrackerResponse> {
     return this.client.request<TournamentTrackerResponse>(
       `/tournament-tracker?accountId=${accountId}`,
@@ -132,7 +137,7 @@ export class TournamentsResource {
         headers: {
           "x-fortnite-token": fortniteToken,
         },
-      }
+      },
     );
   }
 
@@ -151,7 +156,7 @@ export class TournamentsResource {
     options?: {
       days?: number;
       requiredTournaments?: number;
-    }
+    },
   ): Promise<TournamentEligibilityResponse> {
     const params = new URLSearchParams({ accountId });
 
@@ -162,7 +167,7 @@ export class TournamentsResource {
     if (options?.requiredTournaments) {
       params.append(
         "requiredTournaments",
-        options.requiredTournaments.toString()
+        options.requiredTournaments.toString(),
       );
     }
 
@@ -172,7 +177,7 @@ export class TournamentsResource {
         headers: {
           "x-fortnite-token": fortniteToken,
         },
-      }
+      },
     );
   }
 
@@ -253,7 +258,7 @@ export class TournamentsResource {
       leaderboardDef?: string;
     },
     teams: string[][],
-    fortniteToken?: string
+    fortniteToken?: string,
   ): Promise<Leaderboard> {
     const query = new URLSearchParams({
       eventId: params.eventId,
@@ -278,7 +283,7 @@ export class TournamentsResource {
     return this.client.request<Leaderboard>(
       `/events/leaderboard?${query.toString()}`,
       options,
-      "v2"
+      "v2",
     );
   }
 }
