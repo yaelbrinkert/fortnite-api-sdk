@@ -215,9 +215,22 @@ export interface TournamentEligibilityResponse {
 }
 
 // Weapons
-export interface Weapons {
-  key: WeaponsInfos;
+export interface WeaponsResponse {
+  version: string;
+  count: number;
+  source: "iesdev" | "lootpool" | "codenames" | "none";
+  codenames?: string[];
+  lootPool?: {
+    patchVersion: string;
+    lastUpdated: string;
+    replaysProcessed: number;
+  };
+  message?: string;
+  data: Record<string, WeaponsInfos>;
 }
+
+/** @deprecated Use WeaponsResponse instead */
+export type Weapons = WeaponsResponse;
 
 export interface WeaponsInfos {
   id: string;
@@ -228,9 +241,15 @@ export interface WeaponsInfos {
   icon: string;
   type: string;
   category: string | null;
-  season: number;
+  season: number | null;
+  unversioned: boolean;
   series: string;
   stats: WeaponsStats;
+  images: {
+    icon: string | null;
+    iconNoBackground: string | null;
+    largeIcon: string | null;
+  };
 }
 
 export interface GameplayTags {
@@ -562,9 +581,112 @@ export interface PlayerEventData {
   sessions?: Array<any>;
 }
 
+export interface RankRequirement {
+  raw: string;
+  trackId?: string;
+  minimumRank?: number;
+}
+
+export interface WindowRequirements {
+  mfa: boolean;
+  eula: string | null;
+  anticheat: string | null;
+  rankRequirements: RankRequirement[] | null;
+}
+
+export interface EligibilityWindow {
+  eventWindowId: string;
+  beginTime: string;
+  endTime: string;
+  round: number;
+  requireAllTokens: string[];
+  requireAnyTokens: string[];
+  requireNoneTokensCaller: string[];
+  teammateEligibility: string | null;
+  requirements: WindowRequirements;
+}
+
+export interface EligibilityRequirements {
+  minimumAccountLevel: number | null;
+  platforms: string[];
+  systemFeatures: string[];
+  tournamentType: string | null;
+  regionLockType: string | null;
+  accountLockType: string | null;
+  teamLockType: string | null;
+  disqualifyType: string | null;
+}
+
 export interface EligibilityStatus {
-  eligible: boolean;
-  reasons?: string[];
+  eventId: string;
+  region: string;
+  groupId: string;
+  name: string;
+  requirements: EligibilityRequirements;
+  windows: EligibilityWindow[];
+}
+
+// Dynamic player eligibility types
+export interface EligibilityCheck {
+  status: "pass" | "fail" | "unknown";
+  required?: any;
+  message?: string;
+  playerPlatform?: string;
+}
+
+export interface RankCheck {
+  status: "pass" | "fail" | "unknown";
+  type: "OR";
+  details: Array<{
+    trackId: string;
+    minimumRank: number;
+    playerDivision: number | null;
+    status: "pass" | "fail" | "unknown";
+  }>;
+}
+
+export interface PlayerEligibilityWindow {
+  eventWindowId: string;
+  checks: {
+    mfa?: EligibilityCheck;
+    eula?: EligibilityCheck;
+    rank?: RankCheck;
+    requireNoneTokensCaller?: EligibilityCheck;
+  };
+}
+
+export interface PlayerEligibilityResult {
+  eventId: string;
+  accountId: string;
+  region: string;
+  name: string;
+  checks: {
+    minimumAccountLevel?: EligibilityCheck;
+    platform?: EligibilityCheck;
+    systemFeatures?: EligibilityCheck;
+  };
+  windows: PlayerEligibilityWindow[];
+  playerRanks: Record<
+    string,
+    {
+      currentDivision: number | null;
+      highestDivision: number | null;
+      currentPlayerRanking: number | null;
+    }
+  >;
+  checkedAt: string;
+}
+
+// OAuth exchange code types
+export interface OAuthExchangeCodeResponse {
+  success: boolean;
+  accessToken: string;
+  refreshToken: string;
+  expiresIn: number;
+  tokenType: string;
+  scope: string;
+  accountId: string;
+  displayName: string | null;
 }
 
 export interface ArenaHype {

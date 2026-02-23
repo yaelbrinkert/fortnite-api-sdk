@@ -2,6 +2,7 @@ import { FortniteAPI } from "../client";
 import {
   OAuthCompleteResponse,
   OAuthDeviceRefreshResponse,
+  OAuthExchangeCodeResponse,
   OAuthFlowResponse,
   OAuthRefreshResponse,
 } from "../types";
@@ -37,6 +38,25 @@ export class OauthResource {
       method: "POST",
       body: JSON.stringify({ refreshToken }),
     });
+  }
+
+  /**
+   * Exchange authorization code for tokens - POST /oauth/exchange-code
+   * Clean web OAuth flow (no device code warning)
+   */
+  async exchangeCode(params: {
+    code: string;
+    redirectUri: string;
+    clientId?: string;
+    clientSecret?: string;
+  }): Promise<OAuthExchangeCodeResponse> {
+    return this.client.request<OAuthExchangeCodeResponse>(
+      "/oauth/exchange-code",
+      {
+        method: "POST",
+        body: JSON.stringify(params),
+      },
+    );
   }
 
   /**

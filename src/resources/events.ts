@@ -7,6 +7,7 @@ import {
   EventLeaderboard,
   PlayerEventData,
   EligibilityStatus,
+  PlayerEligibilityResult,
   ArenaHype,
   EventRewards,
 } from "../types";
@@ -158,24 +159,46 @@ export class EventsResource {
   }
 
   /**
-   * Check tournament eligibility
-   * @param accountId - Account ID
-   * @param eventId - Event ID
-   * @param fortniteToken - User Fortnite token (REQUIRED)
-   * @returns Eligibility status
+   * Get parsed tournament eligibility requirements.
+   * No user token needed — requirements are extracted from tournament metadata.
+   * @param eventId - Event ID (e.g. epicgames_S39_RankedCupDuosBR_ASIA)
+   * @param eventWindowId - Optional: filter to a specific event window
+   * @returns Parsed eligibility requirements
    */
   async checkEligibility(
-    accountId: string,
     eventId: string,
-    fortniteToken: string
+    eventWindowId?: string,
   ): Promise<EligibilityStatus> {
-    const headers: Record<string, string> = {
-      "x-fortnite-token": fortniteToken,
-    };
+    const query = eventWindowId ? `?eventWindowId=${eventWindowId}` : "";
     return this.client.request<EligibilityStatus>(
-      `/events/${eventId}/eligibility/${accountId}`,
-      { headers },
-      "v2"
+      `/events/${eventId}/eligibility${query}`,
+      {},
+      "v2",
+    );
+  }
+
+  /**
+   * Check a player's eligibility against tournament requirements.
+   * Cross-references ranked data with tournament requirements — no user token needed.
+   * @param eventId - Event ID (e.g. epicgames_S39_RankedCupDuosBR_ASIA)
+   * @param accountId - Epic Games Account ID to check
+   * @param options - Optional platform and eventWindowId
+   * @returns Player eligibility check results
+   */
+  async checkPlayerEligibility(
+    eventId: string,
+    accountId: string,
+    options?: { platform?: string; eventWindowId?: string },
+  ): Promise<PlayerEligibilityResult> {
+    const params = new URLSearchParams();
+    if (options?.platform) params.set("platform", options.platform);
+    if (options?.eventWindowId)
+      params.set("eventWindowId", options.eventWindowId);
+    const query = params.toString() ? `?${params.toString()}` : "";
+    return this.client.request<PlayerEligibilityResult>(
+      `/events/${eventId}/eligibility/${accountId}${query}`,
+      {},
+      "v2",
     );
   }
 
