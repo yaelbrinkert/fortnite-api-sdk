@@ -15,7 +15,7 @@ export interface CatalogEntry {
   offerId: string;
   devName: string;
   offerType: string;
-  prices: Price[];
+  prices: ShopPrice[];
   categories: string[];
   dailyLimit: number;
   weeklyLimit: number;
@@ -31,19 +31,58 @@ export interface CatalogEntry {
   shortDescription: string;
   description: string;
   displayAssetPath: string;
-  itemGrants: ItemGrant[];
+  itemGrants: EnrichedItemGrant[];
   giftInfo?: GiftInfo;
+  bundle: ShopBundle | null;
+  sectionId: string | null;
+  sectionDisplayName: string;
+  sectionPriority: number;
+  sectionBackground: string | null;
+  offerVisual: string | null;
+  tileSize: string | null;
 }
 
-export interface Price {
+export interface ShopPrice {
   currencyType: string;
-  currencySubType: string;
   regularPrice: number;
-  dynamicRegularPrice: number;
   finalPrice: number;
-  saleExpiration: string;
-  basePrice: number;
-  saleType?: string;
+  saleType: string | null;
+}
+
+export interface ShopBundle {
+  name: string | null;
+  info: string;
+  items: number;
+  regularPrice: number;
+  finalPrice: number;
+  discount: number | null;
+}
+
+export interface EnrichedItemGrant {
+  templateId: string;
+  quantity: number;
+  attributes: Record<string, any>;
+  cosmetic: CosmeticEnrichment | null;
+}
+
+export interface CosmeticEnrichment {
+  type: string;
+  name: string;
+  displayName: string;
+  description: string;
+  shortDescription: string;
+  rarity: string;
+  images: {
+    icon: string | null;
+    largeIcon: string | null;
+  };
+  gender: string | null;
+  tags: string[];
+  set: { value: string; backendValue: string } | null;
+  introduction: {
+    chapter: number | null;
+    season: number | null;
+  };
 }
 
 export interface Requirement {
@@ -55,12 +94,6 @@ export interface Requirement {
 export interface MetaInfo {
   key: string;
   value: string;
-}
-
-export interface ItemGrant {
-  templateId: string;
-  quantity: number;
-  attributes: Record<string, any>;
 }
 
 export interface GiftInfo {
@@ -215,17 +248,22 @@ export interface TournamentEligibilityResponse {
 }
 
 // Weapons
+export interface SeasonEntry {
+  chapter: number;
+  season: number;
+  patch: string;
+}
+
 export interface WeaponsResponse {
   version: string;
   count: number;
-  source: "iesdev" | "lootpool" | "codenames" | "none";
-  codenames?: string[];
+  source: "cue4parse" | "lootpool" | "map-archives";
+  availableSeasons: SeasonEntry[];
   lootPool?: {
     patchVersion: string;
     lastUpdated: string;
     replaysProcessed: number;
   };
-  message?: string;
   data: Record<string, WeaponsInfos>;
 }
 
@@ -237,23 +275,22 @@ export interface WeaponsInfos {
   displayName: string;
   description: string;
   rarity: string;
-  gameplayTags: GameplayTags;
-  icon: string;
   type: string;
   category: string | null;
-  season: number | null;
-  unversioned: boolean;
-  series: string;
+  season: { chapter: number; season: number } | null;
+  introductionSeason: { chapter: number; season: number } | null;
+  seasons: SeasonEntry[];
+  gamemode: "br" | "og";
+  ammoType: string | null;
+  triggerType: string | null;
+  tags: string[];
+  searchTags: string;
   stats: WeaponsStats;
   images: {
     icon: string | null;
     iconNoBackground: string | null;
     largeIcon: string | null;
   };
-}
-
-export interface GameplayTags {
-  gameplayTags: Array<String>;
 }
 
 export interface WeaponsStats {
