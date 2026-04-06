@@ -825,6 +825,20 @@ export interface CosmeticsSearchParams {
   rarity?: string;
   set?: string;
   search?: string;
+  season?: number;
+  chapter?: number;
+}
+
+export interface RarityDefinition {
+  value: string;
+  displayValue: string;
+  backendValue: string;
+  color: string;
+}
+
+export interface RarityDefinitionsResponse {
+  status: number;
+  data: RarityDefinition[];
 }
 
 // Crew types

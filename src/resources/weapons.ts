@@ -1,5 +1,5 @@
 import { FortniteAPI } from "../client";
-import { WeaponsResponse } from "../types";
+import { WeaponsResponse, RarityDefinitionsResponse } from "../types";
 
 export class WeaponsResource {
   constructor(private client: FortniteAPI) {}
@@ -38,5 +38,12 @@ export class WeaponsResource {
     if (options?.season) params.set("season", options.season);
     const query = params.toString() ? `?${params.toString()}` : "";
     return this.client.request<WeaponsResponse>(`/weapons${query}`, {}, "v2");
+  }
+
+  /**
+   * Get rarity definitions (colors, display names, backend values)
+   */
+  async getRarityDefinitions(): Promise<RarityDefinitionsResponse> {
+    return this.client.request<RarityDefinitionsResponse>("/rarity", {}, "v2");
   }
 }

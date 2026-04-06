@@ -6,22 +6,32 @@ export class MapResource {
 
   /**
    * Get current Fortnite map with POIs
+   * @param version - Optional specific map version to retrieve
    */
-  async getCurrent(): Promise<MapResponse> {
-    return this.client.request<MapResponse>("/map");
+  async getCurrent(version?: string): Promise<MapResponse> {
+    const query = version ? `?version=${encodeURIComponent(version)}` : "";
+    return this.client.request<MapResponse>(`/map${query}`);
   }
 
   /**
    * Get current map image URL
+   * @param version - Optional specific map version to retrieve
    */
-  async getImage(): Promise<MapImageResponse> {
-    return this.client.request<MapImageResponse>("/map/image");
+  async getImage(version?: string): Promise<MapImageResponse> {
+    const query = version ? `?version=${encodeURIComponent(version)}` : "";
+    return this.client.request<MapImageResponse>(`/map/image${query}`);
   }
 
   /**
    * Get historical map data
+   * @param options.chapter - Filter by chapter number
+   * @param options.season - Filter by season number
    */
-  async getHistory(): Promise<MapHistoryResponse> {
-    return this.client.request<MapHistoryResponse>("/map/history");
+  async getHistory(options?: { chapter?: number; season?: number }): Promise<MapHistoryResponse> {
+    const params = new URLSearchParams();
+    if (options?.chapter) params.set("chapter", options.chapter.toString());
+    if (options?.season) params.set("season", options.season.toString());
+    const query = params.toString() ? `?${params.toString()}` : "";
+    return this.client.request<MapHistoryResponse>(`/map/history${query}`);
   }
 }
