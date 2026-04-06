@@ -21,6 +21,8 @@ export class CosmeticsResource {
     if (params?.rarity) queryParams.set("rarity", params.rarity);
     if (params?.set) queryParams.set("set", params.set);
     if (params?.search) queryParams.set("search", params.search);
+    if (params?.season) queryParams.set("season", params.season.toString());
+    if (params?.chapter) queryParams.set("chapter", params.chapter.toString());
 
     const query = queryParams.toString();
     const endpoint = query ? `/cosmetics/all?${query}` : "/cosmetics/all";

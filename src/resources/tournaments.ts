@@ -10,23 +10,21 @@ export class TournamentsResource {
   constructor(private client: FortniteAPI) {}
 
   /**
-   * Get current events
-   * No parameters needed - uses API's default account
+   * Get currently active and upcoming tournaments, enriched with CMS metadata
    */
   async getCurrent(): Promise<any> {
-    return this.client.request("/events/data/current");
+    return this.client.request("/events/global");
   }
 
   /**
-   * Get past events
-   * No parameters needed - uses API's default account
+   * Get all tournaments including past ones, enriched with CMS metadata
    */
   async getPast(): Promise<any> {
-    return this.client.request("/events/data/past");
+    return this.client.request("/events/global/history");
   }
 
   /**
-   * Get global events with metadata
+   * Get global events with metadata (alias for getCurrent)
    */
   async getGlobal(): Promise<any> {
     return this.client.request("/events/global");
@@ -59,7 +57,7 @@ export class TournamentsResource {
       platform: params.platform,
     }).toString();
 
-    return this.client.request(`/events/download?${query}`, {
+    return this.client.request(`/events/player?${query}`, {
       headers: {
         "x-fortnite-token": fortniteToken,
       },
@@ -116,7 +114,7 @@ export class TournamentsResource {
       : undefined;
 
     return this.client.request<Leaderboard>(
-      `/events/leaderboard?${query.toString()}`,
+      `/events/global/leaderboard?${query.toString()}`,
       options,
     );
   }
