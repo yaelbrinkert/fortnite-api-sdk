@@ -66,12 +66,26 @@ export class TournamentsResource {
 
   /**
    * Get tournament leaderboard
-   * @param params.eventId - Event ID
-   * @param params.eventWindowId - Event window ID
+   *
+   * The `leaderboardDef` parameter serves two distinct purposes depending on the tournament type:
+   *
+   * **1. Ranked Cup (rank-tier leaderboards)**
+   * Pass the rank-tier def ID found in `eventWindow.metadata.defaultLeaderboardByRank`.
+   * The server resolves this to a different internal window ID to return rank-filtered results.
+   * Example: `"ranked_br_division_7"`
+   *
+   * **2. Cumulative leaderboard**
+   * Pass the cumulative def ID found in `eventWindow.scoreLocations` where
+   * `isMainWindowLeaderboard === false`. The server forwards this as Epic's `sm=` query param,
+   * returning the combined leaderboard across all sessions in the same group (e.g. Day 1 + Day 2).
+   * Example: `"S40_FNCSMajor1_PlayInStage_CumulativeLeaderboardDef"`
+   *
+   * @param params.eventId - Event ID (e.g. `"epicgames_S40_FNCSMajor1_PlayInStage_EU"`)
+   * @param params.eventWindowId - Event window ID (e.g. `"S40_FNCSMajor1_PlayInStage_Day1_EU"`)
    * @param params.page - Page number (default: 0)
-   * @param params.leaderboardDef - Optional leaderboard definition
-   * @param params.accountId - Optional account ID to highlight
-   * @param fortniteToken - Optional user's Fortnite token for personalized view
+   * @param params.leaderboardDef - Optional leaderboard definition ID (Ranked Cup tier or cumulative def)
+   * @param params.accountId - Optional account ID — highlights that player in the response
+   * @param fortniteToken - Optional user's Fortnite access token for personalized view
    */
   async getLeaderboard(
     params: {
