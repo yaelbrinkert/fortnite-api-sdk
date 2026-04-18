@@ -144,7 +144,7 @@ export class TournamentsResource {
     fortniteToken: string,
   ): Promise<TournamentTrackerResponse> {
     return this.client.request<TournamentTrackerResponse>(
-      `/tournament-tracker?accountId=${accountId}`,
+      `/events/tracker?accountId=${accountId}`,
       {
         headers: {
           "x-fortnite-token": fortniteToken,
@@ -184,7 +184,7 @@ export class TournamentsResource {
     }
 
     return this.client.request<TournamentEligibilityResponse>(
-      `/tournament-eligibility?${params.toString()}`,
+      `/events/tracker/eligibility?${params.toString()}`,
       {
         headers: {
           "x-fortnite-token": fortniteToken,

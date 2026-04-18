@@ -85,7 +85,7 @@ export class FortniteAPI {
   async request<T>(
     endpoint: string,
     options: RequestInit = {},
-    version: "v1" | "v2" | "v3" = "v1"
+    version: "v1" | "v2" = "v1"
   ): Promise<T> {
     const url = `${this.baseUrl}/${version}${endpoint}`;
 
@@ -123,7 +123,7 @@ export class FortniteAPI {
   async requestMultipart<T>(
     endpoint: string,
     formData: FormData,
-    version: "v1" | "v2" | "v3" = "v1"
+    version: "v1" | "v2" = "v1"
   ): Promise<T> {
     const url = `${this.baseUrl}/${version}${endpoint}`;
 

@@ -30,7 +30,7 @@ export class QuestsResource {
    *
    * **Authentication**: Requires user's personal Fortnite OAuth token
    *
-   * **API Version**: v3
+   * **API Version**: v2
    *
    * **Rate Limit**: Standard API rate limits apply
    *
@@ -61,7 +61,7 @@ export class QuestsResource {
           "x-fortnite-token": fortniteToken,
         },
       },
-      "v3"
+      "v2"
     );
   }
 }

@@ -44,6 +44,6 @@ export class WeaponsResource {
    * Get rarity definitions (colors, display names, backend values)
    */
   async getRarityDefinitions(): Promise<RarityDefinitionsResponse> {
-    return this.client.request<RarityDefinitionsResponse>("/rarity", {}, "v2");
+    return this.client.request<RarityDefinitionsResponse>("/weapons/rarity", {}, "v2");
   }
 }

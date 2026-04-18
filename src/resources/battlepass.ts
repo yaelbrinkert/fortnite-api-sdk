@@ -8,6 +8,6 @@ export class BattlePassResource {
    * Get current battle pass items
    */
   async getBattlePass(): Promise<BattlePass> {
-    return this.client.request<BattlePass>("/battlepass");
+    return this.client.request<BattlePass>("/shop/battlepass");
   }
 }
