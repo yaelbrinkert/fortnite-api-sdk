@@ -163,4 +163,17 @@ export class AccountResource {
       "v1"
     );
   }
+
+  /**
+   * Resolve one or more Epic account IDs to their display names
+   * @param accountIds - Array of Epic Games account IDs (comma-separated, max 100)
+   */
+  async getDisplayNames(accountIds: string[]): Promise<Account[]> {
+    const ids = accountIds.join(",");
+    return this.client.request<Account[]>(
+      `/account/displaynames?ids=${encodeURIComponent(ids)}`,
+      {},
+      "v1"
+    );
+  }
 }
