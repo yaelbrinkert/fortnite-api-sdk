@@ -247,6 +247,46 @@ export interface TournamentEligibilityResponse {
   recent_tournaments: TournamentTrackerEntry[];
 }
 
+export type TokenRequirementType = "mustHave" | "mustHaveAny" | "mustNotHave";
+
+export type TokenGroupType =
+  | "requireAllTokens"
+  | "requireAnyTokens"
+  | "requireNoneTokensCaller"
+  | "requireAllTokensCaller"
+  | "requireAnyTokensCaller";
+
+export interface VerifiedRequirement {
+  token: string;
+  label: string;
+  type: TokenRequirementType;
+  tokenGroup: TokenGroupType;
+  met: boolean;
+}
+
+export interface UnverifiedRequirement {
+  type: "accountLevel" | "systemFeature" | "mfa";
+  key: string;
+  label: string;
+  description: string;
+  /** Only present for accountLevel requirements */
+  threshold?: number;
+  /** Only present for accountLevel requirements */
+  estimatedCurrentLevel?: number | null;
+  /** Only present for accountLevel requirements */
+  estimatedMet?: boolean | null;
+}
+
+export interface EventTokenEligibilityResponse {
+  accountId: string;
+  displayName: string;
+  eventId: string;
+  eventWindowId: string;
+  isEligible: boolean;
+  verifiedRequirements: VerifiedRequirement[];
+  unverifiedRequirements: UnverifiedRequirement[];
+}
+
 // Weapons
 export interface SeasonEntry {
   chapter: number;

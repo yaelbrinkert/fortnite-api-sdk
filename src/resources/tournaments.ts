@@ -4,6 +4,7 @@ import {
   Leaderboard,
   TournamentTrackerResponse,
   TournamentEligibilityResponse,
+  EventTokenEligibilityResponse,
 } from "../types";
 
 export class TournamentsResource {
@@ -191,6 +192,46 @@ export class TournamentsResource {
         },
       },
     );
+  }
+
+  /**
+   * Check a player's token eligibility for a specific event window.
+   *
+   * Verifies all token requirements (requireAllTokens, requireAnyTokens,
+   * requireNoneTokensCaller, etc.) using the Epic tokens endpoint — no player
+   * auth needed. Hardware/system requirements and MFA are always listed as
+   * unverified since they cannot be checked remotely.
+   *
+   * Accepts a display name or an Epic account ID (with or without dashes).
+   *
+   * @param identifier - Player display name or Epic account ID
+   * @param eventId - Epic event ID (e.g. `"epicgames_S40_FNCSMajor1_LCQ_EU"`)
+   * @param options.eventWindowId - Optional window ID; defaults to the most relevant window (live → upcoming → latest ended)
+   * @param options.fortniteToken - Optional user Fortnite token for future extended checks
+   */
+  async checkEventEligibility(
+    identifier: string,
+    eventId: string,
+    options?: {
+      eventWindowId?: string;
+      fortniteToken?: string;
+    },
+  ): Promise<EventTokenEligibilityResponse> {
+    const query = new URLSearchParams();
+
+    if (options?.eventWindowId) {
+      query.append("eventWindowId", options.eventWindowId);
+    }
+
+    const qs = query.toString();
+    const path = `/events/tracker/eligibility/${encodeURIComponent(identifier)}/${encodeURIComponent(eventId)}${qs ? `?${qs}` : ""}`;
+
+    const requestOptions =
+      options?.fortniteToken
+        ? { headers: { "x-fortnite-token": options.fortniteToken } }
+        : undefined;
+
+    return this.client.request<EventTokenEligibilityResponse>(path, requestOptions);
   }
 
   /**
