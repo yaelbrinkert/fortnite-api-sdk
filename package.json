@@ -1,6 +1,6 @@
 {
   "name": "@yaelouuu/fortnite-api",
-  "version": "7.1.0",
+  "version": "7.1.1",
   "description": "SDK for Fortnite API - api-fortnite.com - Author : Yael Brinkert",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
