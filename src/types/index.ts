@@ -558,6 +558,53 @@ export interface SuggestedFriend {
   mutualFriends?: number;
 }
 
+// Profile Service types
+export interface ProfileLevel {
+  accountId: string;
+  /** Current season level */
+  level: number | null;
+  /** Current season XP */
+  xp: number | null;
+  /** Cumulative lifetime account level across all seasons — used for eligibility requirements */
+  accountLevel: number | null;
+  battlePass: {
+    tier: number | null;
+    xp: number | null;
+    purchased: boolean;
+  };
+}
+
+export interface RankedProgress {
+  trackguid: string;
+  rankingType: string | null;
+  gameMode: string;
+  seasonId: string | null;
+  seasonBegin: string | null;
+  seasonEnd: string | null;
+  isCurrent: boolean;
+  currentDivision: number;
+  currentRank: string;
+  highestDivision: number;
+  highestRank: string;
+  rankProgress: number | null;
+  unrealRank: number | null;
+}
+
+export interface TrackDefinition {
+  trackguid: string;
+  trackId: string;
+  rankingType: string;
+  divisionCount: number;
+  beginTime: string | null;
+  endTime: string | null;
+  [key: string]: any;
+}
+
+// Player tokens types
+export interface PlayerTokensResponse {
+  [accountId: string]: string[];
+}
+
 // Stats Service types
 export interface PlayerStats {
   accountId: string;

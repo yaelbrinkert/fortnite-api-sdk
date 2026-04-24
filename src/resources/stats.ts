@@ -24,8 +24,10 @@ export class StatsResource {
   async getPlayerStats(
     accountId: string,
     options?: {
-      startDate?: string;
-      endDate?: string;
+      /** Unix timestamp (e.g. 1773900001). NOT an ISO date string. */
+      startTime?: string | number;
+      /** Unix timestamp (e.g. 1782950340). NOT an ISO date string. */
+      endTime?: string | number;
       stats?: string[];
     },
     fortniteToken?: string
@@ -36,8 +38,8 @@ export class StatsResource {
     }
 
     const queryParams = new URLSearchParams();
-    if (options?.startDate) queryParams.append("startDate", options.startDate);
-    if (options?.endDate) queryParams.append("endDate", options.endDate);
+    if (options?.startTime) queryParams.append("startTime", String(options.startTime));
+    if (options?.endTime) queryParams.append("endTime", String(options.endTime));
     if (options?.stats) queryParams.append("stats", options.stats.join(","));
 
     const query = queryParams.toString();

@@ -6,10 +6,8 @@ import {
   ScoringRules,
   EventLeaderboard,
   PlayerEventData,
-  EligibilityStatus,
-  PlayerEligibilityResult,
-  ArenaHype,
   EventRewards,
+  PlayerTokensResponse,
 } from "../types";
 
 /**
@@ -159,67 +157,19 @@ export class EventsResource {
   }
 
   /**
-   * Get parsed tournament eligibility requirements.
-   * No user token needed — requirements are extracted from tournament metadata.
-   * @param eventId - Event ID (e.g. epicgames_S39_RankedCupDuosBR_ASIA)
-   * @param eventWindowId - Optional: filter to a specific event window
-   * @returns Parsed eligibility requirements
+   * Get the raw token set for one or more players.
+   * Tokens are eligibility flags earned by participating in tournaments
+   * (e.g. qualifying tokens, ban tokens).
+   * No user token required — uses service auth.
+   * @param accountIds - One or more Epic account IDs
    */
-  async checkEligibility(
-    eventId: string,
-    eventWindowId?: string,
-  ): Promise<EligibilityStatus> {
-    const query = eventWindowId ? `?eventWindowId=${eventWindowId}` : "";
-    return this.client.request<EligibilityStatus>(
-      `/events/${eventId}/eligibility${query}`,
+  async getPlayerTokens(accountIds: string | string[]): Promise<PlayerTokensResponse> {
+    const ids = Array.isArray(accountIds) ? accountIds : [accountIds];
+    const qs = ids.map(encodeURIComponent).join("%2C");
+    return this.client.request<PlayerTokensResponse>(
+      `/events/tokens?teamAccountIds=${qs}`,
       {},
-      "v2",
-    );
-  }
-
-  /**
-   * Check a player's eligibility against tournament requirements.
-   * Cross-references ranked data with tournament requirements — no user token needed.
-   * @param eventId - Event ID (e.g. epicgames_S39_RankedCupDuosBR_ASIA)
-   * @param accountId - Epic Games Account ID to check
-   * @param options - Optional platform and eventWindowId
-   * @returns Player eligibility check results
-   */
-  async checkPlayerEligibility(
-    eventId: string,
-    accountId: string,
-    options?: { platform?: string; eventWindowId?: string },
-  ): Promise<PlayerEligibilityResult> {
-    const params = new URLSearchParams();
-    if (options?.platform) params.set("platform", options.platform);
-    if (options?.eventWindowId)
-      params.set("eventWindowId", options.eventWindowId);
-    const query = params.toString() ? `?${params.toString()}` : "";
-    return this.client.request<PlayerEligibilityResult>(
-      `/events/${eventId}/eligibility/${accountId}${query}`,
-      {},
-      "v2",
-    );
-  }
-
-  /**
-   * Get Arena hype and division
-   * @param accountId - Account ID
-   * @param fortniteToken - Optional user Fortnite token
-   * @returns Arena hype, division, and progress
-   */
-  async getArenaHype(
-    accountId: string,
-    fortniteToken?: string
-  ): Promise<ArenaHype> {
-    const headers: Record<string, string> = {};
-    if (fortniteToken) {
-      headers["x-fortnite-token"] = fortniteToken;
-    }
-    return this.client.request<ArenaHype>(
-      `/events/arena/${accountId}`,
-      { headers },
-      "v2"
+      "v1"
     );
   }
 
