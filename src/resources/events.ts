@@ -157,6 +157,25 @@ export class EventsResource {
   }
 
   /**
+   * Find a player's rank and surrounding entries in an event window leaderboard.
+   * Works for any placement including beyond top 10k. No user token required.
+   * @param eventId - Event ID
+   * @param eventWindowId - Event window ID
+   * @param accountId - Epic account ID of the player to look up
+   */
+  async getPlayerLeaderboard(
+    eventId: string,
+    eventWindowId: string,
+    accountId: string
+  ): Promise<EventLeaderboard> {
+    return this.client.request<EventLeaderboard>(
+      `/events/${eventId}/windows/${eventWindowId}/leaderboard/player?accountId=${encodeURIComponent(accountId)}`,
+      {},
+      "v2"
+    );
+  }
+
+  /**
    * Get the raw token set for one or more players.
    * Tokens are eligibility flags earned by participating in tournaments
    * (e.g. qualifying tokens, ban tokens).
