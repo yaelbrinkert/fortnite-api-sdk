@@ -34,11 +34,23 @@ export class ProfilesResource {
 
   /**
    * Get enriched ranked progress — human-readable rank names, game mode labels, season dates.
-   * @param displayName - Epic Games display name
+   * Accepts either a display name or an account ID. Account ID is preferred: it is faster
+   * (skips the name→ID lookup) and is not affected by display name changes.
+   * @param displayName - Epic Games display name (ignored if accountId is provided)
+   * @param options - Optional: pass `accountId` to bypass the name lookup
    */
-  async getRanked(displayName: string): Promise<RankedProgress[]> {
+  async getRanked(
+    displayName: string,
+    options?: { accountId?: string }
+  ): Promise<RankedProgress[]> {
+    const params = new URLSearchParams();
+    if (options?.accountId) {
+      params.append("accountId", options.accountId);
+    } else {
+      params.append("displayName", displayName);
+    }
     return this.client.request<RankedProgress[]>(
-      `/profile/ranked?displayName=${encodeURIComponent(displayName)}`
+      `/profile/ranked?${params.toString()}`
     );
   }
 
