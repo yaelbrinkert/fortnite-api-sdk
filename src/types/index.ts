@@ -813,6 +813,74 @@ export interface OAuthExchangeCodeResponse {
   displayName: string | null;
 }
 
+export interface PlayerWindowStandingSession {
+  sessionId: string;
+  placement: number;
+  teamId: string;
+  teamAccountIds: string[];
+  score: number;
+  trackedStats: Record<string, number>;
+  gameSessionId?: string;
+  gameSessionKey?: string;
+  liveSessionId?: string;
+}
+
+/**
+ * Player standing in a specific event window.
+ * Returned by GET /api/v2/events/{eventId}/windows/{eventWindowId}/players/{accountId}
+ */
+export interface PlayerWindowStanding {
+  eventId: string;
+  eventWindowId: string;
+  teamAccountIds: string[];
+  teamAccountDisplayNames?: string[];
+  pointsEarned: number;
+  rank: number;
+  percentile?: number;
+  sessionHistory: PlayerWindowStandingSession[];
+}
+
+export interface PayoutTableReward {
+  itemType: string;
+  itemId?: string;
+  itemGuid?: string;
+  templateId?: string;
+  quantity: number;
+  rewardType?: string;
+}
+
+export interface PayoutTableRankEntry {
+  threshold: number;
+  items: PayoutTableReward[];
+}
+
+export interface PayoutTablePercentileEntry {
+  scorePercent: number;
+  scoreRank: number;
+  items: PayoutTableReward[];
+}
+
+/**
+ * Payout table for a specific event window.
+ * `scoringType` determines which array is populated:
+ * - `"rank"` → `rankPayoutTable` is present
+ * - `"percentile"` → `percentilePayoutTable` is present
+ */
+export interface PayoutTable {
+  scoringType: "rank" | "percentile" | string;
+  rankPayoutTable?: PayoutTableRankEntry[];
+  percentilePayoutTable?: PayoutTablePercentileEntry[];
+  [key: string]: any;
+}
+
+/**
+ * All payout tables keyed by event window ID.
+ * Returned by GET /api/v1/events/cashprizes
+ */
+export interface CashPrizesResponse {
+  [eventWindowId: string]: PayoutTable;
+}
+
 export interface ArenaHype {
   accountId: string;
   currentHype?: number;

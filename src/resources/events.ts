@@ -2,6 +2,7 @@ import { FortniteAPI } from "../client";
 import {
   EventLeaderboard,
   PlayerTokensResponse,
+  PlayerWindowStanding,
 } from "../types";
 
 /**
@@ -54,6 +55,29 @@ export class EventsResource {
   ): Promise<EventLeaderboard> {
     return this.client.request<EventLeaderboard>(
       `/events/${eventId}/windows/${eventWindowId}/leaderboard/player?accountId=${encodeURIComponent(accountId)}`,
+      {},
+      "v2"
+    );
+  }
+
+  /**
+   * Get a player's standing in a specific event window.
+   *
+   * Uses Epic's dedicated player endpoint — no leaderboard page scanning required.
+   * Returns rank, score, and full session history for the player directly.
+   * No user token required — uses service auth.
+   *
+   * @param eventId - Event identifier (e.g. `"epicgames_S40_FNCSMajor1_PlayInStage_EU"`)
+   * @param eventWindowId - Event window identifier (e.g. `"S40_FNCSMajor1_PlayInStage_Day1_EU"`)
+   * @param accountId - Epic account ID of the player
+   */
+  async getPlayerWindowStanding(
+    eventId: string,
+    eventWindowId: string,
+    accountId: string
+  ): Promise<PlayerWindowStanding> {
+    return this.client.request<PlayerWindowStanding>(
+      `/events/${encodeURIComponent(eventId)}/windows/${encodeURIComponent(eventWindowId)}/players/${encodeURIComponent(accountId)}`,
       {},
       "v2"
     );

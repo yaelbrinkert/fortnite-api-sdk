@@ -5,6 +5,8 @@ import {
   TournamentTrackerResponse,
   TournamentEligibilityResponse,
   EventTokenEligibilityResponse,
+  CashPrizesResponse,
+  PayoutTable,
 } from "../types";
 
 export class TournamentsResource {
@@ -304,6 +306,32 @@ export class TournamentsResource {
    * );
    * ```
    */
+  /**
+   * Get all payout tables across all event windows.
+   *
+   * Player-specific data is stripped — only the reward/prize structures are returned.
+   * The response is an object keyed by event window ID (e.g. `"epicgames_S40_RankedCupSolo_EU_1_Elite"`).
+   * Response is cached for 4 hours.
+   *
+   * No authentication required.
+   */
+  async getCashPrizes(): Promise<CashPrizesResponse> {
+    return this.client.request<CashPrizesResponse>("/events/cashprizes");
+  }
+
+  /**
+   * Get the payout table for a specific event window.
+   *
+   * @param eventWindowId - Event window identifier (e.g. `"epicgames_S40_RankedCupSolo_EU_1_Elite"`)
+   *
+   * @throws {FortniteAPIError} 404 if no payout table exists for the given event window
+   */
+  async getCashPrize(eventWindowId: string): Promise<PayoutTable> {
+    return this.client.request<PayoutTable>(
+      `/events/cashprize/${encodeURIComponent(eventWindowId)}`
+    );
+  }
+
   async getLeaderboardV2(
     params: {
       eventId: string;
