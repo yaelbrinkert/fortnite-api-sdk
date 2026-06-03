@@ -71,16 +71,17 @@ export class FNResource {
   }
 
   /**
-   * Check game version
-   * @param platform - Platform name (Windows, Mac, etc.)
-   * @param version - Version string to check
+   * Get the current Fortnite version for a platform, with optional version string to check against
+   * @param platform - Platform code (e.g. Windows, Android, iOS)
+   * @param version - Optional version string to check against
    */
   async checkVersion(
     platform: string,
-    version: string
+    version?: string
   ): Promise<VersionCheck> {
+    const query = version ? `?version=${encodeURIComponent(version)}` : "";
     return this.client.request<VersionCheck>(
-      `/fn/version/${platform}?version=${encodeURIComponent(version)}`,
+      `/fn/version/${platform}${query}`,
       {},
       "v2"
     );

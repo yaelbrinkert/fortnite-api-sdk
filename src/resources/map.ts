@@ -6,10 +6,14 @@ export class MapResource {
 
   /**
    * Get current Fortnite map with POIs
-   * @param version - Optional specific map version to retrieve
+   * @param version - Optional map version (patch number); defaults to current
+   * @param lang - Language code for POI labels (default: en)
    */
-  async getCurrent(version?: string): Promise<MapResponse> {
-    const query = version ? `?version=${encodeURIComponent(version)}` : "";
+  async getCurrent(version?: string, lang?: string): Promise<MapResponse> {
+    const params = new URLSearchParams();
+    if (version) params.set("version", version);
+    if (lang) params.set("lang", lang);
+    const query = params.toString() ? `?${params.toString()}` : "";
     return this.client.request<MapResponse>(`/map${query}`);
   }
 

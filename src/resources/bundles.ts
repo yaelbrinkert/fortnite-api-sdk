@@ -5,7 +5,7 @@ export class BundlesResource {
   constructor(private client: FortniteAPI) {}
 
   /**
-   * Get current season information
+   * Get tournament asset bundles (images, icons, rewards)
    */
   async getBundlesTournament(): Promise<TournamentsBundle> {
     return this.client.request<TournamentsBundle>(
@@ -14,7 +14,7 @@ export class BundlesResource {
   }
 
   /**
-   * Get current season information
+   * Get shop asset bundles
    */
   async getBundlesShop(): Promise<Shop> {
     return this.client.request<Shop>("/assets/bundles/shop");

@@ -332,6 +332,52 @@ export class TournamentsResource {
     );
   }
 
+  /**
+   * Get top performers for a specific tracked stat across the entire leaderboard.
+   * Fetches all pages in parallel so high-stat but low-placed teams are always included.
+   * Response includes an `availableStats` array listing every stat key tracked in this tournament.
+   * Requires pro or custom plan.
+   * @param eventId - Event identifier (e.g. "epicgames_Bratwurst_Official")
+   * @param eventWindowId - Event window identifier (e.g. "Bratwurst_UpperBracket_Day1")
+   * @param statKey - Tracked stat key to rank by (e.g. TEAM_ELIMS_STAT_INDEX, DamageDealt, Headshots)
+   * @param top - Number of teams to return (default: 10, max: 100)
+   */
+  async getEventStats(
+    eventId: string,
+    eventWindowId: string,
+    statKey: string,
+    top?: number,
+  ): Promise<any> {
+    const params = new URLSearchParams();
+    if (top != null) params.append("top", String(top));
+    const qs = params.toString();
+    return this.client.request<any>(
+      `/events/stats/${encodeURIComponent(eventId)}/${encodeURIComponent(eventWindowId)}/${encodeURIComponent(statKey)}${qs ? `?${qs}` : ""}`,
+    );
+  }
+
+  /**
+   * Get all tracked stats for a specific team.
+   * Returns every stat tracked in this tournament for that team (total + per-game), plus their
+   * rank in the requested statKey across all teams in the event.
+   * Accepts an Epic account ID (32 hex chars) or display name — clan tags are stripped for matching.
+   * Requires pro or custom plan.
+   * @param eventId - Event identifier
+   * @param eventWindowId - Event window identifier
+   * @param statKey - Stat to show this team's rank in (e.g. DamageDealt, TEAM_ELIMS_STAT_INDEX)
+   * @param teamIdentifier - Epic account ID or display name of any player on the team
+   */
+  async getTeamEventStats(
+    eventId: string,
+    eventWindowId: string,
+    statKey: string,
+    teamIdentifier: string,
+  ): Promise<any> {
+    return this.client.request<any>(
+      `/events/stats/${encodeURIComponent(eventId)}/${encodeURIComponent(eventWindowId)}/${encodeURIComponent(statKey)}/${encodeURIComponent(teamIdentifier)}`,
+    );
+  }
+
   async getLeaderboardV2(
     params: {
       eventId: string;

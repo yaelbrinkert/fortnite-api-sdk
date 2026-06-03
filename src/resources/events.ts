@@ -84,6 +84,19 @@ export class EventsResource {
   }
 
   /**
+   * Get a player's event participation history.
+   * Uses the V2 events endpoint with service token — no user token required.
+   * @param accountId - Epic account ID of the player
+   */
+  async getPlayerEventHistory(accountId: string): Promise<any> {
+    return this.client.request<any>(
+      `/events/players/${encodeURIComponent(accountId)}/history`,
+      {},
+      "v2"
+    );
+  }
+
+  /**
    * Get the raw token set for one or more players.
    * Tokens are eligibility flags earned by participating in tournaments
    * (e.g. qualifying tokens, ban tokens).

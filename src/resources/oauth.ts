@@ -5,6 +5,7 @@ import {
   OAuthExchangeCodeResponse,
   OAuthFlowResponse,
   OAuthRefreshResponse,
+  OAuthAuthorizeUrlResponse,
 } from "../types";
 
 export class OauthResource {
@@ -74,6 +75,49 @@ export class OauthResource {
         method: "POST",
         body: JSON.stringify(params),
       }
+    );
+  }
+
+  /**
+   * Get Epic Games authorization URL - GET /oauth/authorize-url
+   * Returns the URL to redirect the user to for standard Epic login (no device confirmation page).
+   * After login, Epic redirects to your redirect_uri with ?code=...
+   * Then call linkAccount() with that code to get the Fortnite access token and device auth.
+   * @param redirectUri - Optional redirect URI registered with Epic
+   */
+  async getAuthorizeUrl(redirectUri?: string): Promise<OAuthAuthorizeUrlResponse> {
+    const query = redirectUri ? `?redirectUri=${encodeURIComponent(redirectUri)}` : "";
+    return this.client.request<OAuthAuthorizeUrlResponse>(
+      `/oauth/authorize-url${query}`,
+      {},
+      "v1"
+    );
+  }
+
+  /**
+   * Link Epic account - POST /oauth/link
+   * Exchanges an Epic authorization code (from GET /oauth/authorize-url flow) for a
+   * Fortnite access token and device auth credentials.
+   * Store the returned deviceAuth (accountId + deviceId + secret) and use refreshDevice()
+   * to silently re-authenticate in the future — no browser required.
+   * @param params.code - Authorization code returned by Epic in the redirect URI
+   * @param params.redirectUri - Must match the redirect URI used in getAuthorizeUrl()
+   * @param params.clientId - Optional custom Epic OAuth client ID
+   * @param params.clientSecret - Optional custom Epic OAuth client secret
+   */
+  async linkAccount(params: {
+    code: string;
+    redirectUri?: string;
+    clientId?: string;
+    clientSecret?: string;
+  }): Promise<OAuthCompleteResponse> {
+    return this.client.request<OAuthCompleteResponse>(
+      "/oauth/link",
+      {
+        method: "POST",
+        body: JSON.stringify(params),
+      },
+      "v1"
     );
   }
 }

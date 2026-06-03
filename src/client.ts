@@ -6,6 +6,7 @@ import { FortniteAPIError } from "./errors";
 import { BundlesResource } from "./resources/bundles";
 import { OauthResource } from "./resources/oauth";
 import { ParsingResource } from "./resources/parsing";
+import { ReplaysResource } from "./resources/replays";
 import { WeaponsResource } from "./resources/weapons";
 import { BattlePassResource } from "./resources/battlepass";
 import { QuestsResource } from "./resources/quests";
@@ -37,6 +38,7 @@ export class FortniteAPI {
   public bundles: BundlesResource;
   public oauth: OauthResource;
   public parsing: ParsingResource;
+  public replays: ReplaysResource;
   public weapons: WeaponsResource;
   public battlepass: BattlePassResource;
   public quests: QuestsResource;
@@ -64,6 +66,7 @@ export class FortniteAPI {
     this.bundles = new BundlesResource(this);
     this.oauth = new OauthResource(this);
     this.parsing = new ParsingResource(this);
+    this.replays = new ReplaysResource(this);
     this.weapons = new WeaponsResource(this);
     this.battlepass = new BattlePassResource(this);
     this.quests = new QuestsResource(this);
@@ -115,6 +118,38 @@ export class FortniteAPI {
 
     const data = await response.json();
     return data as T;
+  }
+
+  /**
+   * Internal method for binary (application/octet-stream) downloads
+   */
+  async requestBinary(
+    endpoint: string,
+    version: "v1" | "v2" = "v1"
+  ): Promise<ArrayBuffer> {
+    const url = `${this.baseUrl}/${version}${endpoint}`;
+
+    const response = await fetch(url, {
+      headers: {
+        "x-api-key": this.apiKey,
+      },
+    });
+
+    if (!response.ok) {
+      let errorData: any;
+      try {
+        errorData = await response.json();
+      } catch {
+        errorData = { error: "Request failed" };
+      }
+      throw new FortniteAPIError(
+        errorData.error || `Request failed with status ${response.status}`,
+        response.status,
+        errorData
+      );
+    }
+
+    return response.arrayBuffer();
   }
 
   /**

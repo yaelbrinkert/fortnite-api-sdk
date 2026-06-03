@@ -176,4 +176,18 @@ export class AccountResource {
       "v1"
     );
   }
+
+  /**
+   * Epic ID SDK v2 lookup — returns extended account info via the Developer Portal API.
+   * Accepts one or more Epic account IDs.
+   * @param accountIds - One or more Epic account IDs (comma-separated)
+   */
+  async getEpicIdSdkAccounts(accountIds: string | string[]): Promise<any[]> {
+    const ids = Array.isArray(accountIds) ? accountIds.join(",") : accountIds;
+    return this.client.request<any[]>(
+      `/account/sdk?accountId=${encodeURIComponent(ids)}`,
+      {},
+      "v1"
+    );
+  }
 }

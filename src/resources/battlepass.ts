@@ -5,9 +5,11 @@ export class BattlePassResource {
   constructor(private client: FortniteAPI) {}
 
   /**
-   * Get current battle pass items
+   * Get current Battle Pass content and rewards
+   * @param lang - Language code (default: en)
    */
-  async getBattlePass(): Promise<BattlePass> {
-    return this.client.request<BattlePass>("/shop/battlepass");
+  async getBattlePass(lang?: string): Promise<BattlePass> {
+    const query = lang ? `?lang=${encodeURIComponent(lang)}` : "";
+    return this.client.request<BattlePass>(`/shop/battlepass${query}`);
   }
 }

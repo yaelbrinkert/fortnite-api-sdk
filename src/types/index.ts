@@ -801,6 +801,11 @@ export interface PlayerEligibilityResult {
   checkedAt: string;
 }
 
+// OAuth authorize URL type
+export interface OAuthAuthorizeUrlResponse {
+  url: string;
+}
+
 // OAuth exchange code types
 export interface OAuthExchangeCodeResponse {
   success: boolean;
@@ -994,6 +999,17 @@ export interface RarityDefinition {
 export interface RarityDefinitionsResponse {
   status: number;
   data: RarityDefinition[];
+}
+
+export interface AvailablePatchInfo {
+  patch: string;
+  isCurrent: boolean;
+}
+
+export interface AvailablePatchesResponse {
+  status: number;
+  current: string | null;
+  patches: AvailablePatchInfo[];
 }
 
 // Crew types
