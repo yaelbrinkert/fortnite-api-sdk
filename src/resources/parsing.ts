@@ -1,9 +1,5 @@
 import { FortniteAPI } from "../client";
-import {
-  ParsingResponse,
-  BatchParsingResponse,
-  ParsedReplayData,
-} from "../types";
+import { ParsingResponse, ParsedReplayData } from "../types";
 
 export class ParsingResource {
   constructor(private client: FortniteAPI) {}
@@ -15,18 +11,6 @@ export class ParsingResource {
     } else {
       formData.append("file", file, filename || "replay.replay");
     }
-    return formData;
-  }
-
-  private buildMultiFormData(files: (File | Blob)[], filenames?: string[]): FormData {
-    const formData = new FormData();
-    files.forEach((file, index) => {
-      if (file instanceof File) {
-        formData.append("files", file);
-      } else {
-        formData.append("files", file, filenames?.[index] || `replay-${index}.replay`);
-      }
-    });
     return formData;
   }
 
@@ -174,74 +158,4 @@ export class ParsingResource {
     return response.data;
   }
 
-  /**
-   * Parse multiple replay files in batch — full parse.
-   * All files are processed in parallel.
-   * Subject to per-plan parsing quota limits (10 credits).
-   * @param files - Array of File objects or Blobs
-   * @param filenames - Filenames (required in Node.js when passing Blobs)
-   */
-  async parseMultipleReplays(files: (File | Blob)[], filenames?: string[]): Promise<ParsedReplayData[]> {
-    const response = await this.client.requestMultipart<BatchParsingResponse>(
-      "/parsing/multiple",
-      this.buildMultiFormData(files, filenames)
-    );
-    if (!response.success || !response.results) {
-      throw new Error(response.error || "Failed to parse replays");
-    }
-    return response.results;
-  }
-
-  /**
-   * Parse multiple replay files — stats only.
-   * Faster than full parse — skips movement, zones, and kill feed.
-   * Subject to per-plan parsing quota limits (5 credits).
-   * @param files - Array of File objects or Blobs
-   * @param filenames - Filenames (required in Node.js)
-   */
-  async parseMultipleReplaysStats(files: (File | Blob)[], filenames?: string[]): Promise<ParsedReplayData[]> {
-    const response = await this.client.requestMultipart<BatchParsingResponse>(
-      "/parsing/multiple/stats",
-      this.buildMultiFormData(files, filenames)
-    );
-    if (!response.success || !response.results) {
-      throw new Error(response.error || "Failed to parse replays stats");
-    }
-    return response.results;
-  }
-
-  /**
-   * Parse multiple replay files — map context for each.
-   * Returns bus path, storm circles, supply drops, llamas, reboot vans per file.
-   * Subject to per-plan parsing quota limits (10 credits).
-   * @param files - Array of File objects or Blobs
-   * @param filenames - Filenames (required in Node.js)
-   */
-  async parseMultipleReplaysMap(files: (File | Blob)[], filenames?: string[]): Promise<ParsedReplayData[]> {
-    const response = await this.client.requestMultipart<BatchParsingResponse>(
-      "/parsing/multiple/map",
-      this.buildMultiFormData(files, filenames)
-    );
-    if (!response.success || !response.results) {
-      throw new Error(response.error || "Failed to parse replays map");
-    }
-    return response.results;
-  }
-
-  /**
-   * Parse multiple replay files — ground loot data for each.
-   * Subject to per-plan parsing quota limits (10 credits).
-   * @param files - Array of File objects or Blobs
-   * @param filenames - Filenames (required in Node.js)
-   */
-  async parseMultipleReplaysLoot(files: (File | Blob)[], filenames?: string[]): Promise<ParsedReplayData[]> {
-    const response = await this.client.requestMultipart<BatchParsingResponse>(
-      "/parsing/multiple/loot",
-      this.buildMultiFormData(files, filenames)
-    );
-    if (!response.success || !response.results) {
-      throw new Error(response.error || "Failed to parse replays loot");
-    }
-    return response.results;
-  }
 }

@@ -5,24 +5,38 @@ export class MapResource {
   constructor(private client: FortniteAPI) {}
 
   /**
-   * Get current Fortnite map with POIs
-   * @param version - Optional map version (patch number); defaults to current
-   * @param lang - Language code for POI labels (default: en)
+   * Get a Fortnite map with its POIs and minimap metadata.
+   * @param version - Map version (patch number); defaults to the current version.
+   * @param mode - Which map to return: `br` (default), `og`, or `rotating:<codename>`.
+   *   The available values are listed in the response's `data.modes`.
+   * @param lang - Language code for POI labels (default: `en`).
+   *
+   * @example
+   * const br = await client.map.getCurrent();
+   * const og = await client.map.getCurrent(undefined, "og");
+   * const reload = await client.map.getCurrent(undefined, "rotating:blastberry");
+   * const old = await client.map.getCurrent("33.00");
    */
-  async getCurrent(version?: string, lang?: string): Promise<MapResponse> {
+  async getCurrent(version?: string, mode?: string, lang?: string): Promise<MapResponse> {
     const params = new URLSearchParams();
     if (version) params.set("version", version);
+    if (mode) params.set("mode", mode);
     if (lang) params.set("lang", lang);
     const query = params.toString() ? `?${params.toString()}` : "";
     return this.client.request<MapResponse>(`/map${query}`);
   }
 
   /**
-   * Get current map image URL
-   * @param version - Optional specific map version to retrieve
+   * Get the map image (302 redirect to the raw image).
+   * Prefer reading `getCurrent().data.imageUrl`, which is the direct URL.
+   * @param version - Map version; defaults to current.
+   * @param mode - Which image: `br` (default), `og`, or `rotating:<codename>`.
    */
-  async getImage(version?: string): Promise<MapImageResponse> {
-    const query = version ? `?version=${encodeURIComponent(version)}` : "";
+  async getImage(version?: string, mode?: string): Promise<MapImageResponse> {
+    const params = new URLSearchParams();
+    if (version) params.set("version", version);
+    if (mode) params.set("mode", mode);
+    const query = params.toString() ? `?${params.toString()}` : "";
     return this.client.request<MapImageResponse>(`/map/image${query}`);
   }
 

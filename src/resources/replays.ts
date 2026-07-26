@@ -132,10 +132,8 @@ export class ReplaysResource {
   }
 
   /**
-   * Download and parse a tournament replay — full broadcast payload.
-   * Combines all data: stats, full lobby, storm zones, map objects, ground loot, and timeline.
-   * Equivalent to calling all parse endpoints in one request.
-   * Subject to per-plan parsing quota limits (20 credits).
+   * @deprecated Use parse() instead. This compatibility route returns the
+   * same combined payload and shares parse()'s 5-credit quota.
    * @param matchId - Match ID from Epic's tournament events API
    */
   async parseBroadcast(matchId: string): Promise<ParsedReplayData> {

@@ -1039,13 +1039,64 @@ export interface CrewHistoryResponse {
 }
 
 // Map types
-export interface MapResponse {
-  status: number;
-  data: {
-    [key: string]: any;
-  };
+
+/** Game mode a map response describes. `br`, `og`, or `rotating:<codename>` (e.g. `rotating:blastberry`). */
+export type MapMode = "br" | "og" | (string & {});
+
+/**
+ * World-space extent of the minimap image, in Unreal units (cm). Combine with
+ * `imageWidth`/`imageHeight` to plot a POI onto the image:
+ * `px = (x - minX) / (maxX - minX) * imageWidth` (and likewise y/height).
+ */
+export interface MapWorldBounds {
+  minX: number;
+  maxX: number;
+  minY: number;
+  maxY: number;
 }
 
+/** A single point of interest on the map. */
+export interface MapPoi {
+  /** Display name, e.g. "TILTED TOWERS". Empty string when the game ships the POI unnamed. */
+  name: string;
+  /** Source gameplay tag, e.g. `Athena.Location.POI.TiltedTowers`. Stable across patches. */
+  tag?: string | null;
+  /** `named`, `landmark`, `generic`, or `unnamed`. */
+  type?: "named" | "landmark" | "generic" | "unnamed" | (string & {}) | null;
+  /** World X (Unreal units / cm). */
+  x?: number | null;
+  /** World Y (Unreal units / cm). */
+  y?: number | null;
+  /** World Z (Unreal units / cm). */
+  z?: number | null;
+}
+
+/** Map data for one version + mode. */
+export interface MapData {
+  version: string;
+  chapter?: number | null;
+  season?: number | null;
+  patch?: string | null;
+  releaseDate?: string | null;
+  /** Which map this response describes: `br`, `og`, or `rotating:<codename>`. */
+  mode: MapMode;
+  /** Direct URL to the minimap image (raw GitHub). Prefer this over `map.getImage()`. */
+  imageUrl?: string | null;
+  /** Minimap image pixel dimensions — pair with `worldBounds` to plot POIs. */
+  imageWidth?: number | null;
+  imageHeight?: number | null;
+  worldBounds?: MapWorldBounds | null;
+  pois: MapPoi[];
+  /** Every mode available for this version — valid values for the `mode` query parameter. */
+  modes: MapMode[];
+}
+
+export interface MapResponse {
+  status: number;
+  data: MapData;
+}
+
+/** `map.getImage()` hits a 302 redirect to the raw image. Prefer `getCurrent().data.imageUrl`. */
 export interface MapImageResponse {
   status: number;
   data: {
@@ -1053,11 +1104,23 @@ export interface MapImageResponse {
   };
 }
 
+/** One entry in the map history list. */
+export interface MapHistoryEntry {
+  version: string;
+  chapter?: number | null;
+  season?: number | null;
+  patch?: string | null;
+  releaseDate?: string | null;
+  hasImage: boolean;
+  imageUrl?: string | null;
+  hasPois: boolean;
+  /** Modes available for this version (`br`, `og`, `rotating:<codename>`). */
+  modes: MapMode[];
+}
+
 export interface MapHistoryResponse {
   status: number;
-  data: {
-    [key: string]: any;
-  };
+  data: MapHistoryEntry[];
 }
 
 // Playlists types
