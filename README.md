@@ -446,6 +446,31 @@ const history = await client.map.getHistory();
 
 ---
 
+### Sprites - **NEW**
+
+Seasonal Sprites catalog (Chapter 7 Season 3 extraction mechanic) — every sprite family and variant with rarity, icons, boons, and **live drop rates**. Drop weights include Epic's live hotfix overlay, so Power-Hour / "More Gem Sprites!" rotations show up without waiting for a game update.
+
+```typescript
+// Get the full catalog (families, variants, drop rates, level-up curve, event weight sets)
+const catalog = await client.sprites.getSprites();
+// catalog.data.sprites[0].variants[1].dropChancePercent -> e.g. 2 (% within the family)
+
+// Only Gold variants across all families
+const gold = await client.sprites.getSprites({ variant: "gold" });
+
+// Search by name, filter by rarity
+const ducks = await client.sprites.getSprites({ search: "duck" });
+const legendaries = await client.sprites.getSprites({ rarity: "legendary" });
+
+// One family — by family id, variant id, or display name
+const duck = await client.sprites.getSprite("DuckSprite");
+
+// All SpriteBoons perks with names and descriptions
+const boons = await client.sprites.getBoons();
+```
+
+---
+
 ### Playlists - **NEW**
 
 Fortnite playlists and game modes.

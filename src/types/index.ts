@@ -1160,3 +1160,90 @@ export interface Playlist {
   lastModified?: string;
   [key: string]: any;
 }
+
+// Sprites (seasonal catalog — CH7 S3 extraction mechanic)
+export interface SpriteImages {
+  icon?: string | null;
+  iconLarge?: string | null;
+}
+
+export interface SpriteBoonRef {
+  id: string;
+  chance?: number | null;
+}
+
+export interface SpriteVariant {
+  id: string;
+  /** Variant label: Base, Gold, Candy, Galaxy, Gem, Holofoil, Cube, ... */
+  variant: string;
+  name?: string | null;
+  rarity?: string | null;
+  /** False when the current hotfix disables the variant. */
+  enabled: boolean;
+  images?: SpriteImages | null;
+  /** Weight as cooked in the game files (PAK). */
+  baseWeight?: number | null;
+  /** Weight after Epic's live hotfix overlay — what the game currently uses. */
+  weight?: number | null;
+  /** Current weight normalized within the family, percentage 0-100. */
+  dropChancePercent?: number | null;
+  boons: SpriteBoonRef[];
+}
+
+export interface SpriteFamily {
+  id: string;
+  name?: string | null;
+  description?: string | null;
+  /** Epic's own sprite-dex ordering number. */
+  dexNumber?: number | null;
+  rarity?: string | null;
+  acquisitionHint?: string | null;
+  extractRewardLootTier?: string | null;
+  images?: SpriteImages | null;
+  tags: string[];
+  boons: SpriteBoonRef[];
+  variants: SpriteVariant[];
+}
+
+export interface SpriteLevel {
+  level: number;
+  xp: number;
+}
+
+export interface SpriteEvent {
+  name: string;
+  weights: Record<string, number>;
+}
+
+export interface SpritesData {
+  gameVersion: string;
+  generated: string;
+  /** True when the drop weights include the live CloudStorage hotfix overlay. */
+  hotfixApplied: boolean;
+  sprites: SpriteFamily[];
+  /** Cumulative Sprite Dust thresholds per sprite level. */
+  levelUpCurve: SpriteLevel[];
+  /** Alternate weight sets from event hotfixes (Power Hours etc.). */
+  events: SpriteEvent[];
+}
+
+export interface SpritesResponse {
+  status: number;
+  data: SpritesData;
+}
+
+export interface SpriteResponse {
+  status: number;
+  data: SpriteFamily;
+}
+
+export interface SpriteBoon {
+  id: string;
+  name?: string | null;
+  description?: string | null;
+}
+
+export interface SpriteBoonsResponse {
+  status: number;
+  data: SpriteBoon[];
+}
