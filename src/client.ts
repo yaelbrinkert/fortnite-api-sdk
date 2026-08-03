@@ -21,6 +21,7 @@ import { CrewResource } from "./resources/crew";
 import { MapResource } from "./resources/map";
 import { PlaylistsResource } from "./resources/playlists";
 import { SpritesResource } from "./resources/sprites";
+import { PowerRankingsResource } from "./resources/powerrankings";
 
 export interface ClientOptions {
   apiKey: string;
@@ -54,6 +55,7 @@ export class FortniteAPI {
   public map: MapResource;
   public playlists: PlaylistsResource;
   public sprites: SpritesResource;
+  public powerRankings: PowerRankingsResource;
 
   constructor(options: ClientOptions) {
     this.apiKey = options.apiKey;
@@ -83,6 +85,7 @@ export class FortniteAPI {
     this.map = new MapResource(this);
     this.playlists = new PlaylistsResource(this);
     this.sprites = new SpritesResource(this);
+    this.powerRankings = new PowerRankingsResource(this);
   }
 
   /**

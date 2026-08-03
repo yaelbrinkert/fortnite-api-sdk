@@ -85,13 +85,38 @@ export class EventsResource {
 
   /**
    * Get a player's event participation history.
-   * Uses the V2 events endpoint with service token — no user token required.
+   *
+   * **`fortniteToken` is mandatory.** Epic serves this history only to the player
+   * it belongs to — service auth is rejected, so a token-less call returns **401**.
+   * Get a token through the OAuth flow: `client.oauth.getToken()` then
+   * `client.oauth.complete()`.
+   *
+   * Returns one score object per event window: `scoreKey` (gameId, eventId,
+   * eventWindowId), `teamId`, `teamAccountIds` (so team size is
+   * `teamAccountIds.length`), `pointsEarned`, `score`, `rank` (the placement),
+   * `percentile`, `pointBreakdown`, `sessionHistory` (one entry per match, with
+   * `endTime` and tracked stats) and `unscoredSessions`.
+   *
+   * Note that Epic returns raw event/window IDs here, not display names — pair it
+   * with `client.tournaments.getTracker()` for human-readable event names and the
+   * official window begin/end times.
+   *
+   * If you do not have the player's token, look a single tournament up instead with
+   * `client.tournaments.getPlayerWindowMatches()`, which needs no user token.
+   *
    * @param accountId - Epic account ID of the player
+   * @param fortniteToken - Required. Fortnite access token of that same player.
+   *
+   * @throws {FortniteAPIError} 401 when the token is missing, expired, or belongs to
+   *                            a different account
    */
-  async getPlayerEventHistory(accountId: string): Promise<any> {
+  async getPlayerEventHistory(
+    accountId: string,
+    fortniteToken: string
+  ): Promise<any> {
     return this.client.request<any>(
       `/events/players/${encodeURIComponent(accountId)}/history`,
-      {},
+      { headers: { "x-fortnite-token": fortniteToken } },
       "v2"
     );
   }

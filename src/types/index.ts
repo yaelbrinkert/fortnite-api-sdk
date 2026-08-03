@@ -845,6 +845,115 @@ export interface PlayerWindowStanding {
   sessionHistory: PlayerWindowStandingSession[];
 }
 
+/**
+ * Tracked stats carried on a Power Rankings ladder entry.
+ * `PR` is the Power Rankings score itself; `countingEvents` is capped at 20
+ * (Epic only counts a player's best 20 events).
+ */
+export interface PowerRankingsTrackedStats {
+  PR: number;
+  countingEvents: number;
+  peakPerf: number;
+  deltaPR: number;
+  peakPR: number;
+  deltaPosition?: number;
+}
+
+export interface PowerRankingsSession {
+  sessionId: string;
+  /** Date of the Epic snapshot this ladder was published from — identical across every entry. */
+  endTime: string;
+  trackedStats: PowerRankingsTrackedStats;
+}
+
+export interface PowerRankingsLeaderboardEntry {
+  gameId: string;
+  eventId: string;
+  eventWindowId: string;
+  teamId: string;
+  teamAccountIds: string[];
+  teamAccountDisplayNames?: string[];
+  /** The player's PR value. `score` carries the same number. */
+  pointsEarned: number;
+  score: number;
+  rank: number;
+  percentile: number;
+  pointBreakdown: Record<string, { timesAchieved: number; pointsEarned: number }>;
+  sessionHistory: PowerRankingsSession[];
+  /** Region/geo identity flag, e.g. `GroupIdentity_GeoIdentity_denmark`. */
+  playerFlagTokens?: Record<string, string>;
+  unscoredSessions?: any[];
+}
+
+/**
+ * Returned by GET /api/v1/events/powerrankings
+ */
+export interface PowerRankingsLeaderboard {
+  gameId: string;
+  eventId: string;
+  eventWindowId: string;
+  page: number;
+  totalPages: number;
+  updatedTime: string;
+  entries: PowerRankingsLeaderboardEntry[];
+  /**
+   * The token holder's own entry — present only when both `x-fortnite-token` and
+   * `accountId` were supplied. `null` when that player is unranked.
+   */
+  playerEntry?: PowerRankingsLeaderboardEntry | null;
+}
+
+export interface PowerRankingsSearchResult {
+  accountId: string;
+  displayName: string;
+  rank: number;
+  score: number;
+  countingEvents: number;
+  peakPr: number;
+  deltaPr: number;
+}
+
+/**
+ * Returned by GET /api/v1/events/powerrankings/search
+ */
+export interface PowerRankingsSearchResponse {
+  query: string;
+  total: number;
+  results: PowerRankingsSearchResult[];
+}
+
+/**
+ * Returned by GET /api/v1/events/powerrankings/player/{identifier}
+ * (requires the x-fortnite-token of the player being looked up)
+ */
+export interface PowerRankingsPlayerEntry {
+  accountId: string;
+  displayName: string;
+  eventId: string;
+  eventWindowId: string;
+  rank?: number;
+  pointsEarned?: number;
+  trackedStats?: PowerRankingsTrackedStats;
+}
+
+/**
+ * Returned by GET /api/v1/events/powerrankings/archive/{accountId}
+ */
+export interface PowerRankingsArchiveEntry {
+  accountId: string;
+  displayName: string;
+  rank: number;
+  score: number;
+  bestRank: number;
+  peakPr: number;
+  deltaPr: number;
+  countingEvents: number;
+  /** When this archived row was last refreshed — not the date of Epic's snapshot. */
+  lastUpdated: string;
+  /** Chapter the ladder belongs to, e.g. `"C7 Power Rankings"`. */
+  seasonLabel: string;
+}
+
 export interface PayoutTableReward {
   itemType: string;
   itemId?: string;

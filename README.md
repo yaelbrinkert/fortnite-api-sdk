@@ -108,7 +108,7 @@ const duoLeaderboard = await client.tournaments.getLeaderboardV2(
 ```
 
 #### Tournament Tracker
-Track player participation history:
+Track player participation history. Returns human-readable event names plus the official window `beginTime` / `endTime`:
 
 ```typescript
 const tracker = await client.tournaments.getTracker(
@@ -116,6 +116,34 @@ const tracker = await client.tournaments.getTracker(
   "fortniteToken"
 );
 // Returns: All tournaments the player has participated in
+```
+
+#### Player Result in One Tournament — **no user token**
+Final placement, points, team and every match played, without the OAuth flow:
+
+```typescript
+const result = await client.tournaments.getPlayerWindowMatches(
+  "epicgames_S41_CashCup_DuosZB_OCE",
+  "S41_CashCup_DuosZB_Event1Round1_OCE",
+  "b6d0db0cefd74ccda92c111e7230ac33",
+  { rankHint: 1 } // optional, but turns a page scan into a single fetch
+);
+
+console.log(result.rank);                  // 1
+console.log(result.pointsEarned);          // 704
+console.log(result.teamAccountIds.length); // 2 -> team size
+console.log(result.matches[0].trackedStats.PLACEMENT_STAT_INDEX);
+```
+
+#### Full Match History — **token required**
+Every tournament match a player has played, grouped by event window. Epic only serves this to the player it belongs to, so a token-less call returns `403`:
+
+```typescript
+const matches = await client.tournaments.getPlayerMatches(
+  "accountId",
+  "fortniteToken",
+  { after: "2026-01-01" }
+);
 ```
 
 #### Check Tournament Eligibility
@@ -148,6 +176,57 @@ const events = await client.tournaments.download(
   "fortniteToken"
 );
 ```
+
+---
+
+### Power Rankings - **NEW**
+
+Epic's own competitive Power Rankings ladder — the same figure shown in the in-game Compete tab and on Fortnite's competitive site. Read live from Epic's events service; nothing here is computed by the API or taken from a third-party tracker.
+
+Top 10,000 players (100 pages x 100), chapter-scoped (e.g. `"C7 Power Rankings"`). Epic publishes the ladder as a periodic snapshot — every entry on every page carries the same `sessionHistory[0].endTime`, which is that snapshot's date. The API re-fetches Epic hourly and rebuilds the search index every 2 hours.
+
+#### Leaderboard
+
+```typescript
+const board = await client.powerRankings.getLeaderboard({ page: 0 });
+
+const top = board.entries[0];
+console.log(top.rank);                              // 1
+console.log(top.pointsEarned);                      // PR score
+console.log(top.sessionHistory[0].trackedStats);    // PR, countingEvents (max 20), peakPR, deltaPR, peakPerf
+console.log(top.teamAccountDisplayNames);           // display names, already resolved
+```
+
+Pass a token **and** the matching `accountId` to also get that player's own entry as `playerEntry`, even when they fall outside the requested page:
+
+```typescript
+const board = await client.powerRankings.getLeaderboard(
+  { page: 0, accountId: "your-account-id" },
+  "fortniteToken"
+);
+console.log(board.playerEntry); // null when unranked
+```
+
+#### Look up one player — **no token**
+
+```typescript
+const found = await client.powerRankings.search("scroll", 3);
+console.log(found.results[0]); // { accountId, displayName, rank, score, countingEvents, peakPr, deltaPr }
+
+const archived = await client.powerRankings.getFromArchive("accountId");
+console.log(archived.rank, archived.bestRank, archived.seasonLabel, archived.lastUpdated);
+```
+
+#### Look up one player — **token required**
+
+`getPlayer()` needs the `x-fortnite-token` of the player being looked up. Epic rejects the underlying `teamAccountIds` filter under service auth, so a token-less call returns **400** for every account, including accounts inside the top 10,000. With the token it resolves players ranked beyond the top 10,000 as well.
+
+```typescript
+const entry = await client.powerRankings.getPlayer("displayNameOrAccountId", "fortniteToken");
+console.log(entry.rank, entry.pointsEarned, entry.trackedStats);
+```
+
+> **Note:** PR is a rolling aggregate of a player's best 20 events (`countingEvents` caps at 20). Epic does not publish how much any individual tournament contributed, so there is no per-event PR figure in this data.
 
 ---
 

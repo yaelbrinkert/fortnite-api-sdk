@@ -137,6 +137,85 @@ export class TournamentsResource {
   }
 
   /**
+   * Get a player's result in one tournament window — **no user token required.**
+   *
+   * Returns their final `rank` (placement), `pointsEarned`, `teamAccountIds` (team
+   * size is `teamAccountIds.length`) and every match they played in that window,
+   * each with `sessionId`, `endTime` and `trackedStats` (`PLACEMENT_STAT_INDEX`,
+   * `TEAM_ELIMS_STAT_INDEX`, `TIME_ALIVE_STAT`, `VICTORY_ROYALE_STAT`, ...).
+   *
+   * The lookup works by scanning leaderboard pages until the player's team is found.
+   * Pass `rankHint` (their approximate final rank) to turn it into a single page
+   * fetch — without it up to `maxPages` pages are scanned in order, which is slower
+   * and may miss players placed beyond that point.
+   *
+   * Use this when you do not have the player's OAuth token. For their full history
+   * across every tournament, use `client.events.getPlayerEventHistory()` (token
+   * required).
+   *
+   * @param eventId - Event identifier (e.g. `"epicgames_S41_CashCup_DuosZB_OCE"`)
+   * @param eventWindowId - Event window identifier (e.g. `"S41_CashCup_DuosZB_Event1Round1_OCE"`)
+   * @param accountId - Epic account ID of any player on the team
+   * @param options.rankHint - Approximate leaderboard rank, if known — makes this a single page fetch
+   * @param options.maxPages - Max leaderboard pages to scan (default: 15, max: 100)
+   *
+   * @throws {FortniteAPIError} 404 when the player was not found within the scanned pages
+   */
+  async getPlayerWindowMatches(
+    eventId: string,
+    eventWindowId: string,
+    accountId: string,
+    options?: { rankHint?: number; maxPages?: number },
+  ): Promise<any> {
+    const params = new URLSearchParams();
+    if (options?.rankHint != null) params.append("rankHint", String(options.rankHint));
+    if (options?.maxPages != null) params.append("maxPages", String(options.maxPages));
+    const qs = params.toString();
+
+    return this.client.request<any>(
+      `/events/${encodeURIComponent(eventId)}/${encodeURIComponent(eventWindowId)}/player/${encodeURIComponent(accountId)}/matches${qs ? `?${qs}` : ""}`,
+    );
+  }
+
+  /**
+   * Get every tournament match a player has played, grouped by event window.
+   *
+   * Sourced from Epic's player-scoped download data, which Epic only serves to the
+   * player it belongs to — so `fortniteToken` is effectively required (without it
+   * Epic returns **403**). For a token-free lookup scoped to one tournament, use
+   * {@link getPlayerWindowMatches}.
+   *
+   * @param accountId - Epic Games Account ID
+   * @param fortniteToken - Fortnite access token of that same player (from OAuth flow)
+   * @param options.after - Only matches ending at or after this UTC timestamp
+   * @param options.before - Only matches ending before this UTC timestamp
+   * @param options.region - Region for the events catalogue (default: EU). Match history itself is global.
+   * @param options.platform - Platform (default: Windows)
+   */
+  async getPlayerMatches(
+    accountId: string,
+    fortniteToken: string,
+    options?: {
+      after?: string;
+      before?: string;
+      region?: string;
+      platform?: string;
+    },
+  ): Promise<any> {
+    const params = new URLSearchParams();
+    if (options?.after) params.append("after", options.after);
+    if (options?.before) params.append("before", options.before);
+    if (options?.region) params.append("region", options.region);
+    if (options?.platform) params.append("platform", options.platform);
+    const qs = params.toString();
+
+    return this.client.request<any>(
+      `/events/player/${encodeURIComponent(accountId)}/matches${qs ? `?${qs}` : ""}`,
+      { headers: { "x-fortnite-token": fortniteToken } },
+    );
+  }
+
+  /**
    * Get tournament participation history for a player
    * Requires user's own Fortnite token
    * @param accountId - Epic Games Account ID
