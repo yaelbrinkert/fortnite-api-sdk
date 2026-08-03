@@ -1,0 +1,89 @@
+name: Publish to npm
+
+# Publishing used to be `npm publish` from Yael's Mac. That needs a personal login
+# and, because the npm account enforces 2FA, an interactive one-time password — so
+# releases were tied to one machine and one pair of hands.
+#
+# This workflow publishes from CI using an npm **automation** token, which is the
+# token type that bypasses the 2FA prompt. Create one at
+# npmjs.com → Access Tokens → Generate New Token → Granular Access Token
+# (or Classic → Automation), scope it to @yaelouuu/fortnite-api, then store it as
+# the repo secret NPM_TOKEN.
+#
+# Release flow:
+#   1. bump "version" in package.json (and commit it)
+#   2. git tag v9.0.1 && git push origin v9.0.1
+# The tag must match the version in package.json — the job refuses to publish if
+# they disagree, so a forgotten bump fails loudly instead of publishing the wrong
+# thing. postpublish fires the Discord webhook exactly as it does locally.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: npm ci || npm install
+
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      # A tag that disagrees with package.json means someone forgot the bump.
+      # Publishing anyway would put the wrong version on the registry, and npm
+      # versions are immutable — so stop here instead.
+      - name: Check tag matches package.json
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          PKG=$(node -p "require('./package.json').version")
+          TAG="${GITHUB_REF_NAME#v}"
+          echo "package.json=$PKG  tag=$TAG"
+          if [ "$PKG" != "$TAG" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match package.json version $PKG. Bump package.json and re-tag."
+            exit 1
+          fi
+
+      # Republishing an existing version is a hard error on npm; catch it early
+      # so the failure message is obvious rather than a registry 403.
+      - name: Check version is unpublished
+        run: |
+          PKG=$(node -p "require('./package.json').version")
+          NAME=$(node -p "require('./package.json').name")
+          if npm view "$NAME@$PKG" version >/dev/null 2>&1; then
+            echo "::error::$NAME@$PKG is already on the registry. Bump the version."
+            exit 1
+          fi
+          echo "$NAME@$PKG is free to publish."
+
+      - name: Publish
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Confirm on registry
+        run: |
+          PKG=$(node -p "require('./package.json').version")
+          NAME=$(node -p "require('./package.json').name")
+          for i in 1 2 3 4 5; do
+            sleep 5
+            if [ "$(npm view "$NAME@$PKG" version 2>/dev/null)" = "$PKG" ]; then
+              echo "$NAME@$PKG is live."
+              exit 0
+            fi
+          done
+          echo "::error::Published but $NAME@$PKG is not resolving on the registry."
+          exit 1
