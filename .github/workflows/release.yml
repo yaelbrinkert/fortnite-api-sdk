@@ -22,6 +22,11 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Run every check (including npm auth) but do not publish"
+        type: boolean
+        default: true
 
 jobs:
   publish:
@@ -57,9 +62,19 @@ jobs:
             exit 1
           fi
 
+      # Fail here, with an obvious message, if NPM_TOKEN is missing/expired/wrong
+      # scope — rather than at the publish step with a bare 403. This also makes
+      # `workflow_dispatch` a genuine credential test before a release is needed.
+      - name: Verify npm credentials
+        run: |
+          echo "authenticated as: $(npm whoami)"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
       # Republishing an existing version is a hard error on npm; catch it early
       # so the failure message is obvious rather than a registry 403.
       - name: Check version is unpublished
+        if: ${{ !inputs.dry_run }}
         run: |
           PKG=$(node -p "require('./package.json').version")
           NAME=$(node -p "require('./package.json').name")
@@ -70,11 +85,13 @@ jobs:
           echo "$NAME@$PKG is free to publish."
 
       - name: Publish
+        if: ${{ !inputs.dry_run }}
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Confirm on registry
+        if: ${{ !inputs.dry_run }}
         run: |
           PKG=$(node -p "require('./package.json').version")
           NAME=$(node -p "require('./package.json').name")
@@ -87,3 +104,12 @@ jobs:
           done
           echo "::error::Published but $NAME@$PKG is not resolving on the registry."
           exit 1
+
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        run: |
+          PKG=$(node -p "require('./package.json').version")
+          NAME=$(node -p "require('./package.json').name")
+          echo "Dry run only — nothing was published."
+          echo "Credentials work, $NAME builds and typechecks, and package.json is at $PKG."
+          echo "To release for real: bump package.json, commit, then push a matching v* tag." 
