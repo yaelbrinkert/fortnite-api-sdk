@@ -510,8 +510,8 @@ export class TournamentsResource {
    * Requires that player's OWN Fortnite token: it is verified against `accountId` before
    * anything is forwarded (any other account's token returns **403**). Fortnite kills every
    * other session of an account when the game launches, so a token obtained before the
-   * player started playing is dead by the time they play — obtain it from stored device
-   * auth (`/oauth/link` once, then `/oauth/refresh-device` on 401), not a one-off login.
+   * player started playing is dead by the time they play — store the `deviceAuth` that
+   * `/oauth/complete` returns and re-authenticate with `/oauth/refresh-device` on 401.
    *
    * While the player is in a game, `sessionId` is the replay match ID: pass it to the
    * replay endpoints once the match has ended. `playlist` lets you filter (e.g. scrims)
