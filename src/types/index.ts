@@ -1356,3 +1356,28 @@ export interface SpriteBoonsResponse {
   status: number;
   data: SpriteBoon[];
 }
+
+/** GET /events/player/{accountId}/session — the match a consenting player is in right now. */
+export interface PlayerSession {
+  accountId: string;
+  /** False when the player's client is offline; no other field is meaningful then. */
+  inParty: boolean;
+  inMatch: boolean;
+  /** The replay match ID while in a game; null in the lobby or offline. */
+  sessionId: string | null;
+  partySize?: number;
+  isLeader?: boolean;
+  /** e.g. "PreLobby" | "InGame" */
+  location?: string | null;
+  gameMode?: string | null;
+  /** e.g. "playlist_showdown_cts_solo" — what they play, or what they have selected in the lobby. */
+  playlist?: string | null;
+  region?: string | null;
+  /** The party runs on a custom match key. The key itself is never returned. */
+  hasCustomKey?: boolean;
+  matchStartedAt?: string | null;
+  playersLeft?: number | null;
+  /** Teammates by account id only. */
+  members?: Array<{ accountId: string | null; isLeader: boolean }>;
+  note?: string;
+}

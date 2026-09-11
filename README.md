@@ -115,7 +115,9 @@ const tracker = await client.tournaments.getTracker(
   "accountId",
   "fortniteToken"
 );
-// Returns: All tournaments the player has participated in
+// Returns: tournaments the player took part in over the last 180 days.
+// The first call for an account queues a backfill of a few minutes: while
+// tracker.history.complete is false the count is a lower bound — re-poll.
 ```
 
 #### Player Result in One Tournament — **no user token**
@@ -135,8 +137,8 @@ console.log(result.teamAccountIds.length); // 2 -> team size
 console.log(result.matches[0].trackedStats.PLACEMENT_STAT_INDEX);
 ```
 
-#### Full Match History — **token required**
-Every tournament match a player has played, grouped by event window. Epic only serves this to the player it belongs to, so a token-less call returns `403`:
+#### Recent Tournament Sessions — **token required**
+A player's recent tournament sessions, grouped by event window. Epic keeps roughly the last **36 hours** of this data, so it is not a full history (use the tracker for 180 days), and private custom-key matches never appear. Epic only serves it to the player it belongs to, so a token-less call returns `403`:
 
 ```typescript
 const matches = await client.tournaments.getPlayerMatches(
@@ -145,6 +147,18 @@ const matches = await client.tournaments.getPlayerMatches(
   { after: "2026-01-01" }
 );
 ```
+
+#### Current Match of a Consenting Player — **token required, Custom plan**
+The match a player is in right now, any mode — Battle Royale, Reload, Ranked or a custom-key scrim hosted by anyone. The only route to non-tournament matches: Epic has no match-history listing. `sessionId` is the replay match ID; `playlist` lets you filter for scrims before parsing.
+
+```typescript
+const session = await client.tournaments.getPlayerSession("accountId", "fortniteToken");
+if (session.inMatch && session.playlist === "playlist_showdown_cts_solo") {
+  console.log(session.sessionId); // parse it with the replay endpoints once the match has ended
+}
+```
+
+Read before building on it: the token must be that player's **own** (verified — any other account's token is `403`); Fortnite kills every other session of an account when the game launches, so mint it from stored device auth (`/oauth/link`, then `/oauth/refresh-device` on `401`); the response is cached 10 s per account and Epic's party state lags the real match by about 1–2 minutes; the custom key is never returned (`hasCustomKey` only) and teammates appear as account ids only.
 
 #### Check Tournament Eligibility
 Verify if a player meets requirements for major tournaments (e.g., 14 tournaments in 180 days):

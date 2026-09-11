@@ -7,6 +7,7 @@ import {
   EventTokenEligibilityResponse,
   CashPrizesResponse,
   PayoutTable,
+  PlayerSession,
 } from "../types";
 
 export class TournamentsResource {
@@ -178,18 +179,21 @@ export class TournamentsResource {
   }
 
   /**
-   * Get every tournament match a player has played, grouped by event window.
+   * A player's RECENT tournament sessions, grouped by event window. Epic keeps roughly
+   * the last 36 hours of this data — it is not a full history. Tournament sessions
+   * only: private custom-key matches never appear here.
    *
    * Sourced from Epic's player-scoped download data, which Epic only serves to the
-   * player it belongs to — so `fortniteToken` is effectively required (without it
-   * Epic returns **403**). For a token-free lookup scoped to one tournament, use
-   * {@link getPlayerWindowMatches}.
+   * player it belongs to — so `fortniteToken` is required (without it Epic returns
+   * **403**). For a 180-day participation history use {@link getTracker}; for a
+   * token-free lookup scoped to one tournament use {@link getPlayerWindowMatches};
+   * for the match a player is in right now use {@link getPlayerSession}.
    *
    * @param accountId - Epic Games Account ID
    * @param fortniteToken - Fortnite access token of that same player (from OAuth flow)
    * @param options.after - Only matches ending at or after this UTC timestamp
    * @param options.before - Only matches ending before this UTC timestamp
-   * @param options.region - Region for the events catalogue (default: EU). Match history itself is global.
+   * @param options.region - Region for the events catalogue (default: EU). The sessions themselves are global.
    * @param options.platform - Platform (default: Windows)
    */
   async getPlayerMatches(
@@ -490,6 +494,34 @@ export class TournamentsResource {
       `/events/leaderboard?${query.toString()}`,
       options,
       "v2",
+    );
+  }
+
+  /**
+   * The match a consenting player is in right now — any mode: Battle Royale, Reload,
+   * Ranked, or a custom-key scrim hosted by anyone. This is the only route to a player's
+   * non-tournament matches: Epic exposes no match-history listing. **Custom plan.**
+   *
+   * Requires that player's OWN Fortnite token: it is verified against `accountId` before
+   * anything is forwarded (any other account's token returns **403**). Fortnite kills every
+   * other session of an account when the game launches, so a token obtained before the
+   * player started playing is dead by the time they play — obtain it from stored device
+   * auth (`/oauth/link` once, then `/oauth/refresh-device` on 401), not a one-off login.
+   *
+   * While the player is in a game, `sessionId` is the replay match ID: pass it to the
+   * replay endpoints once the match has ended. `playlist` lets you filter (e.g. scrims)
+   * before parsing. Cached 10 s per account (polling faster gains nothing); Epic's own
+   * party state lags the real match by about 1-2 minutes; a session ID does not change
+   * during a match. Never returns the custom match key (`hasCustomKey` only) nor
+   * teammates' state (account ids only). `inParty` is false when the client is offline.
+   *
+   * @param accountId - Epic Games Account ID
+   * @param fortniteToken - That same player's Fortnite access token
+   */
+  async getPlayerSession(accountId: string, fortniteToken: string): Promise<PlayerSession> {
+    return this.client.request<PlayerSession>(
+      `/events/player/${encodeURIComponent(accountId)}/session`,
+      { headers: { "x-fortnite-token": fortniteToken } },
     );
   }
 }
