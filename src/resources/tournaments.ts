@@ -502,6 +502,11 @@ export class TournamentsResource {
    * Ranked, or a custom-key scrim hosted by anyone. This is the only route to a player's
    * non-tournament matches: Epic exposes no match-history listing. **Custom plan.**
    *
+   * The token flow authenticates as the Fortnite client, not as your application: Epic warns
+   * the player, and Epic Account Services developer terms do not allow routing your users
+   * through it — suited to tools a player runs for themselves, not third-party apps asking
+   * other players to log in.
+   *
    * Requires that player's OWN Fortnite token: it is verified against `accountId` before
    * anything is forwarded (any other account's token returns **403**). Fortnite kills every
    * other session of an account when the game launches, so a token obtained before the
