@@ -47,15 +47,16 @@ const leaderboard = await client.tournaments.getLeaderboard({
 
 ### Shop
 
-Access the Fortnite Item Shop and Battle Pass data.
+Access the current Fortnite Item Shop.
 
 ```typescript
 // Get current item shop
 const shop = await client.shop.getCurrent();
-
-// Get current Battle Pass
-const battlePass = await client.battlepass.getBattlePass();
 ```
+
+> `client.battlepass.getBattlePass()` is deprecated: the endpoint behind it
+> (`/api/v1/shop/battlepass`) never returned the Battle Pass, only Epic's legacy 2021 news block.
+> For the Battle Pass call `GET /api/v2/battlepass`.
 
 ---
 
@@ -438,25 +439,33 @@ const psnAuth = await client.account.getExternalAuth('accountId123', 'psn');
 
 ---
 
-### News - **NEW**
+### News
 
-Get Fortnite news and announcements for all game modes.
+The in-game lobby news carousel (Epic's "message of the day"), fetched live from Epic as a
+generic account and cached 10 minutes, plus the emergency notices. Pro and Custom plans.
 
 ```typescript
-// Get Battle Royale news
-const brNews = await client.news.getBRNews();
-// Returns: MOTDs, platform messages, images, and videos
+// Battle Royale lobby news — optional language and platform (default en / Windows)
+const br = await client.news.getBRNews();
+const brFr = await client.news.getBRNews("fr", "PS5");
+// br.motds[0] → { id, position, title, body, tileTitle, image, tileImage,
+//                  images, tileImages, buttons: [{ text, action, offerId, linkId }], contentHash }
 
-// Get Save The World news
-const stwNews = await client.news.getSTWNews();
+// Fortnite Festival has its own rotation
+const festival = await client.news.getFestivalNews();
 
-// Get Creative news
-const creativeNews = await client.news.getCreativeNews();
+// Save the World / Creative: Epic currently serves its general lobby rotation for both
+const stw = await client.news.getSTWNews();
+const creative = await client.news.getCreativeNews();
 
-// Get all news at once
-const allNews = await client.news.getAllNews();
-// Returns: { br, stw, creative, lastModified }
+// Emergency notices (warning banners), e.g. a mode leaving
+const notices = await client.news.getNotices();
+
+// Everything at once: { br, stw, creative, festival, notices }
+const all = await client.news.getAllNews("en", "Android");
 ```
+
+Epic personalises the carousel per player, so a real account may see a slightly different set.
 
 ---
 
@@ -735,6 +744,14 @@ MIT
 ---
 
 ## 🆕 Changelog
+
+### v9.2.0 (2026-09-27)
+- 🐛 **News now returns the live lobby news.** `/api/v1/news*` used to return Epic's legacy CMS
+  news blocks, which Epic stopped updating in 2020–2023. They now return the carousel the game
+  shows today, with a new shape (`NewsFeed`: `motds[]` with title, body, images, shop/island
+  buttons). The old `NewsResponse`/`BRNews`/`STWNews`/`CreativeNews` types are deprecated aliases.
+- ✨ `news.getFestivalNews()`, `news.getNotices()`; every news method takes an optional `platform`.
+- ⚠️ `battlepass.getBattlePass()` deprecated — its endpoint never returned the Battle Pass.
 
 ### v4.3.0 (2026-01-08)
 - ✨ **NEW** `NewsResource` with 4 methods:

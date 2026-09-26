@@ -1012,43 +1012,86 @@ export interface EventRewards {
 }
 
 // News types
-export interface NewsResponse<T> {
-  status: number;
-  data: T;
+/** Platforms accepted by the news endpoints (aliases pc, playstation, xbox also work). */
+export type NewsPlatform =
+  | "Windows" | "Mac" | "PS4" | "PS5" | "XboxOneGDK" | "XSX"
+  | "Switch" | "Switch2" | "Android" | "IOS";
+
+export interface NewsImage {
+  width: number;
+  height: number;
+  url: string;
 }
 
+/**
+ * A call-to-action button. `action` is "shop" (see `offerId`), "island" (see `linkId`: an
+ * island code like "0017-2877-1308" or a playlist id like "playlist_juno"), or Epic's raw
+ * action type when it is neither.
+ */
+export interface NewsButton {
+  text: string | null;
+  action: "shop" | "island" | string;
+  offerId: string | null;
+  linkId: string | null;
+}
+
+/** One entry of the lobby news carousel. */
 export interface MOTD {
   id: string;
-  title: string;
-  body: string;
-  image: string;
-  tileImage?: string;
-  videoURL?: string;
-  [key: string]: any;
+  position: number;
+  /** Full-screen title. */
+  title: string | null;
+  /** Full-screen body text. */
+  body: string | null;
+  /** Title shown on the carousel tile. */
+  tileTitle: string | null;
+  /** Largest full-screen image. */
+  image: string | null;
+  /** Largest tile image. */
+  tileImage: string | null;
+  images: NewsImage[];
+  tileImages: NewsImage[];
+  buttons: NewsButton[];
+  contentHash: string | null;
 }
 
-export interface BRNews {
+/** The lobby news carousel for one mode, as a generic account sees it. */
+export interface NewsFeed {
+  mode: "br" | "stw" | "creative" | "festival";
+  /** Epic product tag queried, e.g. "Product.BR". */
+  tag: string;
+  language: string;
+  platform: NewsPlatform;
+  fetchedAt: string;
   motds: MOTD[];
-  platform_motds?: MOTD[];
-  [key: string]: any;
 }
 
-export interface STWNews {
-  motds: MOTD[];
-  [key: string]: any;
-}
-
-export interface CreativeNews {
-  motds: MOTD[];
-  [key: string]: any;
+/** An in-game emergency notice banner. */
+export interface NewsNotice {
+  title: string | null;
+  body: string | null;
+  /** Playlists or experiences the notice is shown in. */
+  playlists: string[];
+  /** When present, the notice is limited to these platforms. */
+  platforms: string[] | null;
 }
 
 export interface AllNews {
-  br: BRNews;
-  stw: STWNews;
-  creative: CreativeNews;
-  lastModified: string;
+  br: NewsFeed;
+  stw: NewsFeed;
+  creative: NewsFeed;
+  festival: NewsFeed;
+  notices: NewsNotice[];
 }
+
+/** @deprecated The API never wrapped news in { status, data }; this is now just `T`. */
+export type NewsResponse<T> = T;
+/** @deprecated Use NewsFeed. */
+export type BRNews = NewsFeed;
+/** @deprecated Use NewsFeed. */
+export type STWNews = NewsFeed;
+/** @deprecated Use NewsFeed. */
+export type CreativeNews = NewsFeed;
 
 // Cosmetics types
 export interface CosmeticsResponse<T> {
